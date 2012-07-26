@@ -33,6 +33,10 @@ gem 'hirb'
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
 
+# Async Server
+gem "sinatra"
+gem "thin"
+
 # To use Jbuilder templates for JSON
 # gem 'jbuilder'
 
