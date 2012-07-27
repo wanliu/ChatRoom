@@ -8,5 +8,19 @@ class User < ActiveRecord::Base
   # Setup accessible (or protected) attributes for your model
   attr_accessible :email, :password, :password_confirmation, :remember_me
   # attr_accessible :title, :body
-  belongs_to :room_member, :class_name => "RoomMember", :primary_key => "user_id"
+  has_one :room_member
+  has_one :room, :through => :room_member
+
+  attr_accessor :default_room
+  @default_room = nil
+
+  def join(_room)
+  	room = _room
+  	save
+  end
+
+  def leave(_room)
+  	room = default_room if room == _room
+  	save
+  end
 end

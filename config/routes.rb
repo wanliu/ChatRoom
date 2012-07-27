@@ -1,9 +1,9 @@
-require 'streamserver'
+require 'msg_server'
 
 ChatRoom::Application.routes.draw do
   devise_for :users
 
-  match "/stream", :to => StreamServer
+  match "/stream", :to => MessageServer
   root :to => 'home#index'
 
   # See how all your routes lay out with "rake routes"
