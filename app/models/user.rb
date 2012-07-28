@@ -14,13 +14,17 @@ class User < ActiveRecord::Base
   attr_accessor :default_room
   @default_room = nil
 
-  def join(_room)
-  	room = _room
-  	save
+  def join(room_name)
+    room = Room.find_by_name(room_name)
+    if room
+      r = build_room_member
+      r.room = room
+      r.save
+    end
   end
 
-  def leave(_room)
-  	room = default_room if room == _room
-  	save
+  def leave
+    room = nil
+    save
   end
 end

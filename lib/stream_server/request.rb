@@ -1,5 +1,6 @@
 module StreamServer
   class Request < DelegateClass(Sinatra::Request)
+    include Session
 
     attr_accessor :connections
 

@@ -6,6 +6,8 @@ ChatRoom::Application.routes.draw do
   match "/stream", :to => MessageServer
   root :to => 'home#index'
 
+  resources :users
+
   # See how all your routes lay out with "rake routes"
 
   # This is a legacy wild controller route that's not recommended for RESTful applications.

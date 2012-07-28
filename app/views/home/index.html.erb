@@ -3,11 +3,13 @@
 <script>
   // reading
   var es = new EventSource('/stream');
-  es.onmessage = function(e) { $('#chat').append(e.data + "\n") };
+  es.onmessage = function(e) { 
+    $('#chat').append(e.data + "\n") 
+  };
 
   // writing
   $("form").live("submit", function(e) {
-    $.post('/stream', {msg: "<%= current_user.email %>: " + $('#msg').val()});
+    $.post('/stream', {msg: $('#msg').val()});
     $('#msg').val(''); $('#msg').focus();
     e.preventDefault();
   });

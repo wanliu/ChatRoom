@@ -2,7 +2,6 @@ module StreamServer
   module Dispatcher
     class Base
       include Session
-
       cattr_accessor :global_connections
       @@global_connections = []
 
@@ -39,6 +38,26 @@ module StreamServer
         def params
           @params = (@request && @request.params) || {}
         end
+
+        def user_connection(user)
+          cons = global_connections.select{ |conn| conn.user == user }
+          conn = cons.pop
+          cons.clear
+          conn
+        end
+
+        def user_stream(user)
+          user_connection(user).stream
+        end 
+
+        def current_stream
+          user_connection(current_user).stream
+        end
+
+        def message(msg)
+          "data: #{current_user.email}: #{msg}\n\n"
+        end
+
     end
   end
 end
