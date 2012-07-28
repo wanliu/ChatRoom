@@ -3,27 +3,42 @@ module StreamServer
     class Base
       include Session
 
-      attr_accessor :connections, :params, :handler
+      cattr_accessor :global_connections
+      @@global_connections = []
 
-      def connections 
-        @connections ||= []
+      attr_accessor :connections, :handler
+
+      def initialize
+
+        yield(self) if block_given?
+      end
+  
+      def add_connection(stream, request)
+        global_connections << Connection.fetch(stream, request)
+      end
+
+      def global_connections 
+        @@global_connections
+      end
+
+      def remove_connection(conn)
+        global_connections.delete(conn)
+      end
+
+      def connections
+        (@request && @request.connections) || []
       end
 
       def dispatch(request)
         @request = request
-
-        room = current_user.room
-        unless room.blank?
-          room_connections(room).each do |conn| 
-            conn.stream << "data: #{params[:msg]}\n\n" 
-          end
-        end
+        handler.dispatch(request) if handler && handler.respond_to?(:dispatch)
         204 # response without entity body
       end
 
-      def room_connections(room)
-        connections.select { |conn| conn.user.room == room }
-      end
-    end 
+      private 
+        def params
+          @params = (@request && @request.params) || {}
+        end
+    end
   end
 end

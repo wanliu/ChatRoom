@@ -1,3 +1,5 @@
+# encoding : utf-8
+# Copyright (C) 2012 Hysios Hu  <hysios@gmail.com>
 require 'sinatra'
 require 'thin'
 
@@ -8,26 +10,18 @@ module StreamServer
 
     get '/stream', provides: 'text/event-stream' do
       stream :keep_open do |out|
-        conn = Connection.fetch(out, request)
-        dispatcher.connections << conn
+        conn = dispatcher.add_connection(out, request)
         #settings.connections << conn
-        out.callback { dispatcher.connections.delete conn }
-        out.errback { dispatcher.connections.delete conn }
+        out.callback { dispatcher.remove_connection(conn) }
+        out.errback { dispatcher.remove_connection(conn) }
       end
     end
 
     post '/stream' do
-      puts "Relay to #{dispatcher.connections.count} streams"
-      # @request = request
-      dispatcher.params = params
-      dispatcher.dispatch(request)
-      # room = current_user.room
-      # unless room.blank?
-      #   room_connections(room).each do |conn| 
-      #     conn.stream << "data: #{params[:msg]}\n\n" 
-      #   end
-      # end
-      # 204 # response without entity body
+      puts "Relay to #{dispatcher.global_connections.count} streams"
+      _request = Request.new(request)
+      _request.connections += dispatcher.global_connections
+      dispatcher.dispatch(_request)
     end
 
 

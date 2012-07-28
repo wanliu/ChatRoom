@@ -1,23 +1,26 @@
 module StreamServer
   module Session
-
+    
     def session
-      session_record && session_record.data
+      session_adapter.session
     end
+
 
     def current_user
-      return nil unless session && user_key = session["warden.user.user.key"]
-      Warden::SessionSerializer.new(User).deserialize(user_key)
+      session_adapter.current_user
     end
 
+    def session_adapter
+      @session_adapter ||= DeviseAdapter.new(@request)
+    end
     private 
 
-    def session_id
-      @request.cookies[Rails.application.config.session_options[:key]]
-    end
+      def session_id
+        session_adapter.session_id
+      end
 
-    def session_record
-      ActiveRecord::SessionStore::Session.find_by_session_id(session_id)
-    end
+      def session_record
+        session_adapter.session_record
+      end
   end
 end

@@ -1,6 +1,14 @@
 module StreamServer
   class GeneratorArgumentMismatch < ArgumentError ; end
-
+  # Generater a dispatcher DSL
+  # Examples 
+  #  class MessageServer < StreamServer::Server
+  #     dispatch do 
+  #       use :command
+  #       use "RoomDispatcher"
+  #       use ::StreamServer::Dispatcher::CommandDispatcher
+  #     end
+  #  end
   class DispatchGenerator
     cattr_reader :dispatchers
     @@dispatchers = []
@@ -12,9 +20,9 @@ module StreamServer
       end
 
       def generate_dispatch
-        first_klass = @@dispatchers.first.new
+        first_klass = @@dispatchers.pop.new
         @@dispatchers.reverse.inject(first_klass) do |dispatcher, klass|
-          klass.new { handler = dispatcher }
+          klass.new { |k| k.handler = dispatcher }
         end
       end
     end
