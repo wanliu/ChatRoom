@@ -16,11 +16,12 @@ describe Room do
 
   it "User can join a Room" do
     @room1.members.should_not include(@bill)
-    @bill.join(@room1)
+    @bill.join("new_rom")
     @room1.members.reload.should include(@bill)
   end
 
   it "User can leave a Room" do
-    @bill.leave(@room1)
+    @bill.leave
+    @bill.room.should be_nil
   end
 end
