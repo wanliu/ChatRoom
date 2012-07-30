@@ -11,7 +11,7 @@ module StreamServer
     end
 
     def session_adapter
-      @session_adapter = DeviseAdapter.new(@request)
+      @session_adapter ||= DeviseAdapter.new(@request)
     end
     private 
 

@@ -20,9 +20,9 @@ module StreamServer
           puts "COMMAND:#{command}"
           case command
           when "help"
-#            debugger
-#            current_stream << message(usage)
-            output(usage)
+            usage.split("\n").each do |line|
+              current_stream << message(line + "\n")
+            end
           when "list"
             room_names = Room.all.collect {|room| room.name }
             current_stream << message(room_names)
@@ -56,12 +56,14 @@ module StreamServer
       end
 
       def usage
-#        "帮助\n/help           : 显示此命令帮助\n/list           : 显示全部方间\n/join Room Name : 进入 Room Name 房间\n/leave          : 离开当前的房间\n/at             : 显示所在房间\n/members        : 显示房间中所有成员\n"
-        """usage asdfasdf asd
-          falsesdf
-          asdfasdfas
-          defasd
-"""
+        """帮助
+/help           : 显示此命令帮助
+/list           : 显示全部房间
+/join Room Name : 进入 Room Name 房间
+/leave          : 离开当前的房间
+/at             : 显示所在房间
+/members        : 显示房间中所有成员
+        """
       end
     end
   end

@@ -1,7 +1,6 @@
 module StreamServer
   module Dispatcher
     class Base
-      include Session
       cattr_accessor :global_connections
       @@global_connections = []
 
@@ -13,7 +12,10 @@ module StreamServer
       end
   
       def add_connection(stream, request)
-        global_connections << Connection.fetch(stream, request)
+        conn = Connection.fetch(stream, request)
+        global_connections.delete_if { |c| c.user == conn.user }
+        puts global_connections.size
+        global_connections << conn
       end
 
       def global_connections 
@@ -54,10 +56,27 @@ module StreamServer
           user_connection(current_user).stream
         end
 
+        def current_user
+          RequestSession.fetch(@request).current_user
+        end
+
+
         def message(msg)
           "data: #{current_user.email}: #{msg}\n\n"
         end
 
+    end
+
+    class RequestSession
+      include Session
+
+      def self.fetch(request)
+        new(request)
+      end
+
+      def initialize(request)
+        @request = request
+      end
     end
   end
 end
