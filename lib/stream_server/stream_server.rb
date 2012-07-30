@@ -4,6 +4,7 @@ module StreamServer
   autoload :DispatchGenerator ,  'stream_server/dispatch_generator'
   autoload :Server            ,  'stream_server/server'
   autoload :Request           ,  'stream_server/request'
+  autoload :Stream            ,  'stream_server/stream'
 
   module Session
   	autoload :DeviseAdapter, "stream_server/session/devise"

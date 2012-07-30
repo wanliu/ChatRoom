@@ -20,9 +20,7 @@ module StreamServer
           puts "COMMAND:#{command}"
           case command
           when "help"
-            usage.split("\n").each do |line|
-              current_stream << message(line + "\n")
-            end
+            current_stream << message(usage)
           when "list"
             room_names = Room.all.collect {|room| room.name }
             current_stream << message(room_names)
@@ -36,9 +34,14 @@ module StreamServer
           when "leave"
             current_user.leave
           when "at"
-            current_stream << message(current_user.room.name)
+            if current_user.room.nil?
+              current_stream << message("not in room,please use /list , /join Join a room")
+            else
+              current_stream << message(current_user.room.name)
+            end
           when "members"
-            users = current_user.room.members.collect { |m| m.email }
+            members = current_user.room.members
+            users = members.select { |u| global_connections.any? { |c| c.user == u } }.collect { |u| u.email }
             current_stream << message(users)
           else
             current_stream << message('error command')
@@ -47,12 +50,6 @@ module StreamServer
         else
           false
         end
-      end
-
-      def output(msg)
-        current_stream << "data:\n"
-
-        msg.split('\n').each { | line| puts line; current_stream << line }
       end
 
       def usage

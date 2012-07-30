@@ -10,6 +10,7 @@ module StreamServer
 
     get '/stream', provides: 'text/event-stream' do
       stream :keep_open do |out|
+        puts "Establish a connection..."
         conn = dispatcher.add_connection(out, request)
         #settings.connections << conn
         out.callback { dispatcher.remove_connection(conn) }

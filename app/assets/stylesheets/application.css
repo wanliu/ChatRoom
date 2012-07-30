@@ -9,6 +9,16 @@
  * compiled file, but it's generally better to create a new file per style scope.
  *
  *= require bootstrap
+ *= require fbody
+ *= require responsive
  *= require_self
- *= require_tree .
  */
+
+
+[class^="icon-"],
+[class*=" icon-"] {
+  background-image: url("glyphicons-halflings.png");
+}
+.icon-white {
+  background-image: url("glyphicons-halflings-white.png");
+}

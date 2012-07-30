@@ -10,7 +10,7 @@ module StreamServer
     end
 
     def initialize(stream, request)
-      @stream = stream
+      @stream = Stream.new(stream)
       @request = request.dup
     end
 

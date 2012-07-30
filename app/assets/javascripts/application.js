@@ -14,8 +14,11 @@
 //= require jquery_ujs
 //= require bootstrap
 //= require underscore
+//= require namespace
 //= require backbone
 //= require backbone_rails_sync
 //= require backbone_datalink
 //= require backbone/chat_room
-//= require_tree .
+
+
+

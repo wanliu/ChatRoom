@@ -24,7 +24,8 @@ class User < ActiveRecord::Base
   end
 
   def leave
-    room = nil
+    room_member.detete
     save
+    reload
   end
 end

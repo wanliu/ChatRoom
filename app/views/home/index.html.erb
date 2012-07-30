@@ -1,20 +1,7 @@
-<pre id='chat'></pre>
+<% content_for :javascript do 
+  javascript_include_tag "home"
+end %>
 
-<script>
-  // reading
-  var es = new EventSource('/stream');
-  es.onmessage = function(e) { 
-    $('#chat').append(e.data + "\n") 
-  };
-
-  // writing
-  $("form").live("submit", function(e) {
-    $.post('/stream', {msg: $('#msg').val()});
-    $('#msg').val(''); $('#msg').focus();
-    e.preventDefault();
-  });
-</script>
-
-<form>
-  <input id='msg' placeholder='type message here...' />
-</form>
+<% content_for :stylesheet do 
+  stylesheet_link_tag "home"
+end %>
