@@ -1,24 +1,25 @@
-// This is a manifest file that'll be compiled into application.js, which will include all the files
-// listed below.
-//
-// Any JavaScript/Coffee file within this directory, lib/assets/javascripts, vendor/assets/javascripts,
-// or vendor/assets/javascripts of plugins, if any, can be referenced here using a relative path.
-//
-// It's not advisable to add code directly here, but if you do, it'll appear at the bottom of the
-// the compiled file.
-//
-// WARNING: THE FIRST BLANK LINE MARKS THE END OF WHAT'S TO BE PROCESSED, ANY BLANK LINE SHOULD
-// GO AFTER THE REQUIRES BELOW.
+//    ________          __     ____                      
+//   / ____/ /_  ____ _/ /_   / __ \____  ____  ____ ___ 
+//  / /   / __ \/ __ `/ __/  / /_/ / __ \/ __ \/ __ `__ \
+// / /___/ / / / /_/ / /_   / _, _/ /_/ / /_/ / / / / / /
+// \____/_/ /_/\__,_/\__/  /_/ |_|\____/\____/_/ /_/ /_/   v0.1.0
+                                                          
+
+// Copyright 2012 WanLiu, Inc
+// Licensed under the Apache License v2.0
+// http://www.apache.org/licenses/LICENSE-2.0
+
+// author: hysios@gmail.com
 //
 //= require jquery
 //= require jquery_ujs
 //= require bootstrap
 //= require underscore
 //= require namespace
+//= require mixable
 //= require backbone
 //= require backbone_rails_sync
 //= require backbone_datalink
 //= require backbone/chat_room
-
-
+//= require lib/bezier
 

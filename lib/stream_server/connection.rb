@@ -16,6 +16,7 @@ module StreamServer
 
     def user_room
       ActiveRecord::Base.silence { user.room }
+      # user.room
     end
   end
 end

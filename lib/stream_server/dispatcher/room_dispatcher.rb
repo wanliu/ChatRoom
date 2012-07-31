@@ -4,7 +4,8 @@ module StreamServer
       def dispatch(request)
         @request = request
         room = ActiveRecord::Base.silence { @request.current_user.room }
-        puts "Room"
+        # room = @request.current_user.room
+        puts "Room" if Rails.env.development?
         if !room.nil?
           room_connections(room).each do |conn| 
             conn.stream << message(params['msg']) 

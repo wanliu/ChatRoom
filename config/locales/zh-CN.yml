@@ -196,12 +196,16 @@ zh-CN:
   sign_in: "登入"
   sign_up: "注册"
   forgot_your_password?: "忘了密码"
+  update: "更新"
+  we_need_your_current_password: "我们需要你当前密码才能进行修改"
+  leave_blank_if_you: "如果你不想修改,请保持为空白"
 
   activerecord:
     models:
       user: 用户
     attributes:
       user:
+        nickname: "昵称"
         email: "邮件"
         password: "密码"
         remember_me: "记住我"

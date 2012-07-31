@@ -1,13 +1,16 @@
 /*
- * This is a manifest file that'll be compiled into application.css, which will include all the files
- * listed below.
- *
- * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
- * or vendor/assets/stylesheets of plugins, if any, can be referenced here using a relative path.
- *
- * You're free to add application-wide styles to this file and they'll appear at the top of the
- * compiled file, but it's generally better to create a new file per style scope.
- *
+ *    ________          __     ____                      
+ *   / ____/ /_  ____ _/ /_   / __ \____  ____  ____ ___ 
+ *  / /   / __ \/ __ `/ __/  / /_/ / __ \/ __ \/ __ `__ \
+ * / /___/ / / / /_/ / /_   / _, _/ /_/ / /_/ / / / / / /
+ * \____/_/ /_/\__,_/\__/  /_/ |_|\____/\____/_/ /_/ /_/   v0.1.0
+ *                                                              
+  
+ * Copyright 2012 WanLiu, Inc
+ * Licensed under the Apache License v2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
+ 
+ * author: hysios@gmail.com *
  *= require bootstrap
  *= require fbody
  *= require responsive
@@ -21,4 +24,23 @@
 }
 .icon-white {
   background-image: url("glyphicons-halflings-white.png");
+}
+
+.dialog {
+	position: fixed;
+	top: 60px;
+	z-index: 1050;
+	overflow: auto;
+	background-color: white;
+	border: 1px solid #999;
+	border: 1px solid rgba(0, 0, 0, 0.3);
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	border-radius: 6px;
+	-webkit-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+	-moz-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+	-webkit-background-clip: padding-box;
+	-moz-background-clip: padding-box;
+	background-clip: padding-box;
 }

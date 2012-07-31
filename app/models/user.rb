@@ -1,3 +1,16 @@
+#    ________          __     ____                      
+#   / ____/ /_  ____ _/ /_   / __ \____  ____  ____ ___ 
+#  / /   / __ \/ __ `/ __/  / /_/ / __ \/ __ \/ __ `__ \
+# / /___/ / / / /_/ / /_   / _, _/ /_/ / /_/ / / / / / /
+# \____/_/ /_/\__,_/\__/  /_/ |_|\____/\____/_/ /_/ /_/   v0.1.0
+#                                                            
+#
+# Copyright 2012 WanLiu, Inc
+# Licensed under the Apache License v2.0
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# author: hysios@gmail.com
+
 class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :token_authenticatable, :confirmable,
@@ -6,7 +19,7 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable
 
   # Setup accessible (or protected) attributes for your model
-  attr_accessible :email, :password, :password_confirmation, :remember_me
+  attr_accessible :nickname, :email, :password, :password_confirmation, :remember_me
   # attr_accessible :title, :body
   has_one :room_member
   has_one :room, :through => :room_member

@@ -17,7 +17,7 @@ module StreamServer
       def parse(msg)
         if msg =~ COMMAND
           command = $1.downcase
-          puts "COMMAND:#{command}"
+          puts "COMMAND:#{command}" if Rails.env.development?
           case command
           when "help"
             current_stream << message(usage)

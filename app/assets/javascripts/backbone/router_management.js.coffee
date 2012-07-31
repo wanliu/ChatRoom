@@ -11,6 +11,16 @@
 
 # author: hysios@gmail.com
 
-class ApplicationController < ActionController::Base
-  protect_from_forgery
-end
+namespace "ChatRoom.RouterManagement", (ex) ->
+
+	router_singleton_class = []
+
+	ex.register_router = (klass) ->
+		router_singleton_class.push klass
+
+	ex.start = () ->
+		_(router_singleton_class).each (klass, i) ->
+			new klass
+
+		console.log 'start'
+		Backbone.history.start()

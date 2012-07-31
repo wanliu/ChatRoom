@@ -11,7 +11,6 @@ module StreamServer
       if datas.length > 1
         _author , first_line = author(datas.shift)
         datas.unshift(first_line)
-        puts _author
         @stream << _author + "\n\n"
         datas.each do |line|
           @stream << "data: #{line}\n\n" 
