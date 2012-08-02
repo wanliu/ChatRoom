@@ -1,6 +1,17 @@
 <div class="row">
   <div class="span10">
-    <pre id='chat'></pre>    
+    <pre id='chat'></pre>
+    <form class='input-text'>
+      <div class="row"> 
+        <div class="span9"> 
+           <textarea id='msg' class="span9" placeholder='type message here...' />
+        </div>
+        <div class="span1">
+          <button class="btn btn-primary">发送</button>
+          <span>Ctrl+Enter</span>
+        </div>
+        </div>
+    </form>    
   </div>
 
   <div class="span2 pull-right">
@@ -11,20 +22,6 @@
     </div>
   </div>
   
-</div>
-<div class='input-text'>
-  <form>
-    <div class="row"> 
-      <div class="span9"> 
-         <textarea id='msg' class="span9" placeholder='type message here...' />
-      </div>
-      <div class="span1">
-        <button class="btn btn-primary">发送</button>
-        <span>Ctrl+Enter</span>
-      </div>
-      </div>
-  </form>
-
 </div>
 
 <script>

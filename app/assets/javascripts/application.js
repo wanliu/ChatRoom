@@ -22,4 +22,7 @@
 //= require backbone_datalink
 //= require backbone/chat_room
 //= require lib/bezier
+//= require helpers
+
+
 

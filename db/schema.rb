@@ -11,22 +11,27 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120731023143) do
+ActiveRecord::Schema.define(:version => 20120731031009) do
+
+  create_table "profiles", :force => true do |t|
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "room_members", :force => true do |t|
-    t.integer  "room_id",    :limit => 11
-    t.integer  "user_id",    :limit => 11
-    t.datetime "created_at",               :null => false
-    t.datetime "updated_at",               :null => false
+    t.integer  "room_id"
+    t.integer  "user_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "rooms", :force => true do |t|
     t.string   "name"
     t.string   "type"
-    t.integer  "member_limit", :limit => 11
-    t.integer  "onwer",        :limit => 11
-    t.datetime "created_at",                 :null => false
-    t.datetime "updated_at",                 :null => false
+    t.integer  "member_limit"
+    t.integer  "onwer"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
   end
 
   create_table "sessions", :force => true do |t|

@@ -15,16 +15,28 @@ namespace "ChatRoom", (ex) ->
 
 
 	class ex.ProfileView extends Backbone.View
-		template: ChatRoom.template("profile/dialog")
+		template_dialog: ChatRoom.template("profile/dialog")
+		template_ember: ChatRoom.template("profile/ember")
+		mini: {
+			height  : 20,
+			width   : 200
+		}
 
 		initialize: (@options) ->
-			@mask_layout = new ex.MaskLayout(view: @)
-			#@user = ex.OnlineUser.find_by_name(@options.user)
+			@template = @template_ember
 
 		render: () ->
+
 			$(@el).html(@template())
-			$("#layout").append(@el)
+			[@origin_width, @origin_height] = [$(@el).width(), $(@el).height()]
+			$(@el)
+				.height(@mini.height)
+				.width(@mini.width)
+				.css('overflow', 'hidden') if @options.mini
+
 			#$(@mask_layout.el).append(@template())
+		getOriginSize: () ->
+			[@origin_width, @origin_height]
 
 	class ex.MaskLayout extends Backbone.View
 
@@ -45,20 +57,3 @@ namespace "ChatRoom", (ex) ->
 			$(@view.el).remove()
 			@remove()
 
-
-	class ex.ProfileRouter extends Backbone.Router
-		routes: {
-			"profile/:user_name":        "profile"
-		}
-
-		profile: (user_name) ->
-			# view = new ex.ProfileView(user: user_name)
-			# view.render();		
-
-		help: () ->
-			alert("help")
-
-
-
-
-ChatRoom.RouterManagement.register_router(ChatRoom.ProfileRouter)

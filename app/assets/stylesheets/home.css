@@ -25,3 +25,11 @@
 #chat {
 	overflow-y:auto;
 }
+
+.lantern li {
+  display: none
+}
+
+.lantern li.active {
+  display: block;
+}

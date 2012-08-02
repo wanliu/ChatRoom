@@ -16,9 +16,13 @@
 
 namespace "ChatRoom", (exports) ->
 
-	class exports.HomeApplication
-
+	class DelayedApplicatonBase
 		constructor: () ->
+			setTimeout($.proxy(@init, @), 1)
+
+	class exports.HomeApplication extends DelayedApplicatonBase
+
+		init: () ->
 
 			@home = new exports.HomeView
 			@home.render()
@@ -31,7 +35,6 @@ namespace "ChatRoom", (exports) ->
 
 			ChatRoom.RouterManagement.start();
 
-
 		@fetch_users = () ->
 			@online_users ||= new exports.OnlineUsers
 
@@ -42,11 +45,7 @@ namespace "ChatRoom", (exports) ->
 
 		render: () ->
 			$(@el).html(@template())
-
-
-	class EffectContext
-
-		initialize: (@properties) ->
+			@lantern = new exports.LanternView(@$(".span10"))
 
 	func_remap = { top: 'Y', left: 'X' }
 
@@ -55,7 +54,7 @@ namespace "ChatRoom", (exports) ->
 		className: 'user'
 
 		events: {
-			"click": "fly"
+			"click": "doFly"
 		}
 
 		render: () ->
@@ -66,62 +65,79 @@ namespace "ChatRoom", (exports) ->
 			@
 
 		coord: (x, y) ->
-			{x: x , y: y }
+			{'x': x , 'y': y }
 
 		position_to_coord: (position) ->
 			@coord(position.left, position.top)
 
-		fly: ()->
-			@fly_el = $(@el).clone()
-			
+		readyFly: () ->
+
 			originPos = $(@el).position()
+
+			@fly_el = $("<div />")
+				.css({
+					'position'  : 'absolute',
+					'z-index' 	: '1080',
+					'display'   : 'block'
+				})
+				.appendTo("body")
+				.offset(originPos)
+
+			@profile_view = new exports.ProfileView(user: @model.get('email'), el: @fly_el, 'mini': true)
+			@profile_view.render()
+			[@old_width, @old_height] = @profile_view.getOriginSize()
+			console.log @old_width, @old_height
+
+			#@fly_el = $(@el).clone()
+
 			@startPos = @position_to_coord(originPos)
 
-			target = {
-				top: $(window).height() / 2,
-				left: $(window).width() / 2 
+			cp = $(".lantern").position()
+			cx = cp.left + @old_width / 2
+			cy = cp.top + @old_height / 2
+
+			@target = {
+				top: cy, left: cx
 			}
-			@endPos = @position_to_coord(target);
-			@control1 = @coord(@startPos.x, @endPos.x + 200)
-			@control2 = @coord(@endPos.y, @endPos.y + 200)
-			@percent = {}
+			@endPos = @position_to_coord(@target);
+			@control1 = @coord(@startPos.x - 50, @startPos.y - 650)
+			@control2 = @coord(@endPos.x - 100, @endPos.y - 100)
+			@percent = 1		
 
-			@fly_el.css('position', 'absolute').appendTo("body").offset(originPos)
-			@fly_el2 = @fly_el.clone().appendTo("body")
-			@fly_el.animate({
-				top: $(window).height() / 2,
-				left: $(window).width() / 2 
-			}, {
-	  			duration: 1000, 
-				step : (now, fx) =>
-					per = @percent[fx.prop] = 1 - now / target[fx.prop];
-					xy = @remap_func(fx.prop)(per, @startPos, @endPos ,@control1, @control2 )
-					# $(@fly_el).css(fx.prop, Math.round(xy))
-					@fly_el2.css(fx.prop, Math.round(xy))
-					console.log "percent: #{per}, prop: #{fx.prop}, xy: #{xy}"
-					console.log "sPos: #{@startPos.x}, #{@startPos.y} ePos: #{@endPos.x}, #{@endPos.y} "
-					console.log "c1: #{@control1.x}, #{@control1.y} c2: #{@control2.x}, #{@control2.y} "
-					# fx.pos = xy
-					# xy
 
+		doFly: () ->
+			@readyFly()
+
+			Backbone.history.navigate("profile/#{@model.get('email')}", {trigger: false, replace: true})
+			@fly()
+			false
+
+
+		fly: ()->
+			
+			return @flyDone() if @percent < 0
+			@percent -= 0.01
+			pos = ChatRoom.Math.getBezier(@percent, @startPos, @endPos, @control1, @control2)
+			width = Math.round(@old_width * (1 - @percent))
+			height = Math.round(@old_height * (1 -@percent))
+			@fly_el.css({
+				'top'         : Math.round(pos.y), 
+				'left'        : Math.round(pos.x),
+				'width'       : width,
+				'height'      : height,
+				'margin-top'  : -(height / 2),
+				'margin-left' : -(width / 2)
 			})
 
-		remap_func: (prop)->
-			func = ChatRoom.Math["getBezier#{func_remap[prop]}"]
+			console.log @old_width
+
+			setTimeout($.proxy(@fly, @),10)
+
+		flyDone: () ->
+			window.Home.home.lantern.append(@profile_view)
 
 		link_to: (display, url) ->
-			$("<a href=#{url} >#{display}</a>").wrap('<p>').parent().html()
-
-
-	class BezierEffect
-
-		initialize: (@element, @startPos, @endPos, @control1, @control2) ->
-
-		calc: (now) ->
-
-		animate: (@properties) ->
-
-
+			$("<a href=# >#{display}</a>").wrap('<p>').parent().html()
 
 
 	class exports.RightSideView extends Backbone.View
@@ -165,5 +181,20 @@ namespace "ChatRoom", (exports) ->
 
 			$(@el).height(p1.top - p2.top - 30)
 
+	class exports.HomeRouter extends Backbone.Router
+		routes: {
+			"profile/:user_name":        "profile"
+		}
+
+		profile: (user_name) ->
+			child = window.Home.home.lantern.allocChild()
+			view = new exports.ProfileView(user: user_name, el: child)
+			view.render()
+
+		help: () ->
+			alert("help")
 
 	window.Home = new exports.HomeApplication
+
+	ChatRoom.RouterManagement.register_router(ChatRoom.HomeRouter)
+
