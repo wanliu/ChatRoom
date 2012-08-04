@@ -12,6 +12,7 @@ module StreamServer
       stream :keep_open do |out|
         puts "Establish a connection..."
         conn = dispatcher.add_connection(out, request)
+        ActiveRecord::Base.connection.close
         #settings.connections << conn
         out.callback { dispatcher.remove_connection(conn) }
         out.errback { dispatcher.remove_connection(conn) }
@@ -23,6 +24,7 @@ module StreamServer
       _request = Request.new(request)
       _request.connections += dispatcher.global_connections
       dispatcher.dispatch(_request)
+      ActiveRecord::Base.connection.close
     end
 
 

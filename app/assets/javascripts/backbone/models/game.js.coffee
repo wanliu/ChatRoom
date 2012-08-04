@@ -10,17 +10,13 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 
 # author: hysios@gmail.com
-#= require_self
-#= require ./router_management
-#= require lib/viewports
-#= require_tree ./templates
-#= require_tree ./models
-#= require_tree ./views
-#= require_tree ./routers
 
-namespace "ChatRoom", (exports) ->
-  exports.template_path = "backbone/templates"
+namespace "ChatRoom", (ex) ->
 
-  exports.template = (name) ->
-  	JST["#{exports.template_path}/#{name}"]
+	class ex.Game extends Backbone.Model
+		urlRoot: "/games"
 
+
+	class ex.GameCollection extends Backbone.Collection
+		url: "/games"
+		model: ex.Game

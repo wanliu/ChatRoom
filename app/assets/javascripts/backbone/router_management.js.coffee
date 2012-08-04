@@ -18,9 +18,8 @@ namespace "ChatRoom.RouterManagement", (ex) ->
 	ex.register_router = (klass) ->
 		router_singleton_class.push klass
 
-	ex.start = () ->
+	ex.start = (options) ->
 		_(router_singleton_class).each (klass, i) ->
 			new klass
 
-		console.log 'start'
-		Backbone.history.start()
+		Backbone.history.start(options)

@@ -35,6 +35,9 @@ namespace "ChatRoom", (exports) ->
 
 			ChatRoom.RouterManagement.start();
 
+		fetchView: (name) ->
+			@home.lantern
+
 		@fetch_users = () ->
 			@online_users ||= new exports.OnlineUsers
 
@@ -183,7 +186,9 @@ namespace "ChatRoom", (exports) ->
 
 	class exports.HomeRouter extends Backbone.Router
 		routes: {
-			"profile/:user_name":        "profile"
+			"profile/:user_name" :      "profile"
+			"help"   			 :	  	"help"
+			"hall"				 :		"hall"
 		}
 
 		profile: (user_name) ->
@@ -193,6 +198,12 @@ namespace "ChatRoom", (exports) ->
 
 		help: () ->
 			alert("help")
+
+		hall: () ->
+			child = window.Home.home.lantern.allocChild()
+			view = new exports.GameHallView(el: child)
+			view.render()
+	
 
 	window.Home = new exports.HomeApplication
 

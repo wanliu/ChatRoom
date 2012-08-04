@@ -14,8 +14,14 @@
 namespace "ChatRoom", (ex) ->
 
 	class ex.LanternView
+		# default_configuration = {
+		# 	register: default_register
+
+		# 	render: defautlt_render
+		# }
 
 		constructor: (element) ->
+			@patterns = [] 
 			@wrap(element) if element? 
 
 		wrap: (element) ->
@@ -49,6 +55,11 @@ namespace "ChatRoom", (ex) ->
 		appendElement: (element) ->
 			child = @allocChild()
 			$(element).appendTo(child)
+
+		default_register = (pattern, child ) ->
+			child
+
+
 
 		# private 
 		setCurrent = (el) ->
