@@ -18,7 +18,7 @@ namespace "ChatRoom", (ex) ->
 		template: ChatRoom.template("games/hall")
 
 		render: () ->
-			@$(@el).html(@template())
+			$(@el).html(@template())
 
 
 	class ex.GameRoomView extends Backbone.View

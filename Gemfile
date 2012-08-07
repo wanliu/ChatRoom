@@ -25,6 +25,7 @@ group :test, :development do
 end
 
 gem 'jquery-rails'
+gem 'modernizr-rails'
 gem 'devise'
 gem 'devise-i18n'
 gem 'anjlab-bootstrap-rails', '>= 2.0', :require => 'bootstrap-rails'

@@ -13,6 +13,7 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require modernizr
 //= require bootstrap
 //= require underscore
 //= require namespace
@@ -22,6 +23,8 @@
 //= require backbone_datalink
 //= require backbone/chat_room
 //= require lib/bezier
+//= require lib/box-slider/box-slider.jquery
+//= require_tree ./lib/box-slider/effects
 //= require helpers
 
 

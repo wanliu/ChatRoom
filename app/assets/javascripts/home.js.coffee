@@ -31,12 +31,16 @@ namespace "ChatRoom", (exports) ->
 			@right_side.render()
 
 			@chat = new exports.ChatView
-			@chat.resize();
+			@chat.resize()
+
+			@home.attachContainer()
+
+			# $('.container-view').boxSlider('showSlide', 1);
 
 			ChatRoom.RouterManagement.start();
 
-		fetchView: (name) ->
-			@home.lantern
+		getContainer: () ->
+			@home.container ||= @home.render().container
 
 		@fetch_users = () ->
 			@online_users ||= new exports.OnlineUsers
@@ -48,7 +52,12 @@ namespace "ChatRoom", (exports) ->
 
 		render: () ->
 			$(@el).html(@template())
-			@lantern = new exports.LanternView(@$(".span10"))
+
+		attachContainer: () ->
+			@container = new Viewport.ContainerView(el: @$(".span10")[0] )
+			#@container.setElement(@$(".span10")[0])
+
+			# @lantern = new exports.LanternView(@$(".span10"))
 
 	func_remap = { top: 'Y', left: 'X' }
 
@@ -95,7 +104,8 @@ namespace "ChatRoom", (exports) ->
 
 			@startPos = @position_to_coord(originPos)
 
-			cp = $(".lantern").position()
+			@container = Home.getContainer().el
+			cp = $(@container).position()
 			cx = cp.left + @old_width / 2
 			cy = cp.top + @old_height / 2
 
@@ -137,7 +147,7 @@ namespace "ChatRoom", (exports) ->
 			setTimeout($.proxy(@fly, @),10)
 
 		flyDone: () ->
-			window.Home.home.lantern.append(@profile_view)
+			window.Home.getContainer.append(@profile_view)
 
 		link_to: (display, url) ->
 			$("<a href=# >#{display}</a>").wrap('<p>').parent().html()
@@ -171,6 +181,7 @@ namespace "ChatRoom", (exports) ->
 
 		el: "#chat"
 		msg_target: "#msg"
+		bottom_target: ".input-text"
 
 		initialize: () ->
 
@@ -179,31 +190,147 @@ namespace "ChatRoom", (exports) ->
 
 		resize:(event) ->
 
-			p1 = $(@msg_target).offset();
-			p2 = $(@el).position()
+			max_height = $(window).height()
 
-			$(@el).height(p1.top - p2.top - 30)
+			padding_hegiht = parseInt($(@el).css('padding-top')) +
+				parseInt($(@el).css('padding-bottom')) + 
+				parseInt($(@el).css('border-bottom-width'))	+ 
+				parseInt($(@el).css('border-top-width'))
+
+			bottom_height = $(@bottom_target).outerHeight(true) 
+
+			p1 = $(@el).offset()
+
+			$(@el).height(max_height - bottom_height - padding_hegiht - p1.top - 10)
 
 	class exports.HomeRouter extends Backbone.Router
 		routes: {
 			"profile/:user_name" :      "profile"
+			"home"				 : 		"home"
 			"help"   			 :	  	"help"
 			"hall"				 :		"hall"
 		}
 
+		constructor: ->
+			@containerView = Home.getContainer()
+			# @profile_view = new exports.ProfileView()
+			@containerView.registerView (context) =>
+				@hall_view ||= new exports.GameHallView(el: context.el )
+
+			@containerView.registerView "profile", (context, user_name) =>
+				@profile_view ||= new exports.ProfileView(user_name: user_name, el: context.el )
+
+
+			@containerView.registerEffect (effect)->
+				effects = {
+					container_el: ">.container-view"
+					initialize: (@container_view, @options) ->
+						@viewport = $(@container_view.element)
+						@container = @viewport.find(@container_el)
+						@deg = 0
+
+					enterScene: (@old_active) ->
+						{top   , left} = @viewport.position()
+						[width , height] = [@viewport.width() , @viewport.height()]
+
+						@old_viewport_css  = @saveCss(@viewport)
+						@old_container_css = @saveCss(@container)
+
+
+						vp = {
+							position              : 'relative',
+							'-webkit-perspective' : '1000px',
+							overflow              : 'visible',
+							width                 : width,
+							height                : height
+						}
+
+						cp = {
+							position                  : 'absolute',
+							top                       : 0,
+							left                      : 0,
+							width                     : width,
+							height                    : height,
+							'-webkit-transform-style' : 'preserve-3d',
+							# '-webkit-transform'     : 'translate3d(0px, 0px, 0px) rotate3d(0, 1, 0, 0deg)',
+							'-webkit-transition'    : '-webkit-transform 1s'
+						}
+
+						@viewport.css(vp)
+						@container.css(cp)
+
+
+					transition: () ->
+						active = @container.find(">div.active")
+
+						oldIndex = @old_active.parent().prevAll().length
+						Index = active.parent().prevAll().length
+
+
+						front_css = {
+							'position'          : 'absolute',
+							'top'               : 0,
+							'left'              : 0,
+							'-webkit-transform' : 'rotate3d(0, 1, 0, -90deg) translate3d(0px, 0px, 340px)',
+							'display'           : 'block',
+							'overflow'          : 'visible',
+							'z-index'           : 2
+						}
+
+						pair_css = {
+							'position'          : 'absolute',
+							'top'               : 0,
+							'left'              : 0,
+							'-webkit-transform' : 'rotate3d(0, 1, 0, 0deg) translate3d(0px, 0px, 340px)',
+							'display'           : 'block',
+							'overflow'          : 'visible'
+							'z-index'           : 1
+						}
+
+						@deg = if @deg >= 270 then 0 else @deg + 90
+						rotate3_str = if @deg == 0 then "" else "rotate3d(0, 1, 0, #{@deg}deg)"
+						cont_css = {
+							'-webkit-transform'     : "translate3d(0px, 0px, -340px) #{rotate3_str}",
+						}
+
+						active.css(front_css)						
+						@old_active.css(pair_css)
+						@container.css(cont_css)
+
+					transitionFrom: (from, to) ->
+
+
+
+					revertScene: () ->
+
+						@container
+							.removeAttr("style")
+							.css(@old_container_css)
+						@viewport
+							.removeAttr("style")
+							.css(@old_viewport_css)					
+				}
+
+
+			super
+
+
 		profile: (user_name) ->
-			child = window.Home.home.lantern.allocChild()
-			view = new exports.ProfileView(user: user_name, el: child)
-			view.render()
+			@containerView.switchView "profile", user_name, (context) => 
+				# context.view = 
+				context.view.fetch(user_name)
+				context.switch()
 
 		help: () ->
 			alert("help")
 
+		home: () ->
+			context = @containerView.first()
+			@containerView.switchView(context.view)
+
 		hall: () ->
-			child = window.Home.home.lantern.allocChild()
-			view = new exports.GameHallView(el: child)
-			view.render()
-	
+			@containerView.switchView(@hall_view)
+
 
 	window.Home = new exports.HomeApplication
 

@@ -12,7 +12,6 @@
 # author: hysios@gmail.com
 #= require_self
 #= require ./router_management
-#= require lib/viewports
 #= require_tree ./templates
 #= require_tree ./models
 #= require_tree ./views
