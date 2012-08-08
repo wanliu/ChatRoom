@@ -23,8 +23,6 @@
 //= require backbone_datalink
 //= require backbone/chat_room
 //= require lib/bezier
-//= require lib/box-slider/box-slider.jquery
-//= require_tree ./lib/box-slider/effects
 //= require helpers
 
 

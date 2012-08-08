@@ -20,3 +20,4 @@ namespace "ChatRoom", (ex) ->
 	class ex.GameCollection extends Backbone.Collection
 		url: "/games"
 		model: ex.Game
+

@@ -35,12 +35,14 @@ namespace "ChatRoom", (exports) ->
 
 			@home.attachContainer()
 
+			@current_user = exports.User.current_user()
 			# $('.container-view').boxSlider('showSlide', 1);
 
 			ChatRoom.RouterManagement.start();
 
 		getContainer: () ->
 			@home.container ||= @home.render().container
+
 
 		@fetch_users = () ->
 			@online_users ||= new exports.OnlineUsers
@@ -71,8 +73,9 @@ namespace "ChatRoom", (exports) ->
 
 		render: () ->
 			email = @model.get('email')
+			gravatar = @model.get('gravatar') + "?s=20"
 			email_path = "#profile/#{email}"
-			display = "<i class='icon-user' ></i>#{@link_to(email, email_path)}"
+			display = "#{image_tag(gravatar, 'gravatar')} #{@link_to(email, email_path)}"
 			$(@el).html(display)
 			@
 
@@ -224,12 +227,16 @@ namespace "ChatRoom", (exports) ->
 			@containerView.registerEffect (effect)->
 				effects = {
 					container_el: ">.container-view"
-					initialize: (@container_view, @options) ->
+					initialize: (@container_view, @options = {}) ->
 						@viewport = $(@container_view.element)
 						@container = @viewport.find(@container_el)
-						@deg = 0
+						@angle = 0
+						@reverse = true
+						@isVert = @options.isVert || false
 
-					enterScene: (@old_active) ->
+						@enterScene()
+
+					enterScene: () ->
 						{top   , left} = @viewport.position()
 						[width , height] = [@viewport.width() , @viewport.height()]
 
@@ -245,6 +252,8 @@ namespace "ChatRoom", (exports) ->
 							height                : height
 						}
 
+						@translateZ = if @isVert then  @container.height() / 2 else  @container.width() / 2
+
 						cp = {
 							position                  : 'absolute',
 							top                       : 0,
@@ -252,54 +261,81 @@ namespace "ChatRoom", (exports) ->
 							width                     : width,
 							height                    : height,
 							'-webkit-transform-style' : 'preserve-3d',
-							# '-webkit-transform'     : 'translate3d(0px, 0px, 0px) rotate3d(0, 1, 0, 0deg)',
-							'-webkit-transition'    : '-webkit-transform 1s'
+							'-webkit-transform'       : "translate3d(0, 0 , -#{@translateZ}px)",
 						}
 
 						@viewport.css(vp)
 						@container.css(cp)
 
+			
+						@sliders = @container.find(">div")
+						@sliders.css {
+							"position" : "absolute"
+							"top"      : 0
+							"left"     : 0
+							"width"    : width
+							"height"   : height
+						}
+						@sliders.eq(0).css('-webkit-transform', 'rotate3d(0, 1, 0, 0deg) translate3d(0, 0, ' + @translateZ + 'px)')
+
+						@sliders.filter(":gt(0").hide()
+
+						@currentIndex = 0
+						@currentSlider = @sliders.eq(@currentIndex)
+
+						setTimeout () => 
+							@reset()
+						, 10
+							
+					reset: () ->
+						@container.css("-webkit-transition", "-webkit-transform 1s")
+
+					rotate3d: (angle, isVert =  @isVert) ->
+						switch angle 
+							when 360 , -360 then 'rotate3d(0, 1, 0, 0deg)' # front
+							when 90  , -270 then "rotate3d(#{if isVert then '1, 0, 0' else '0, 1, 0'}, -90deg)" # bottom / left side
+							when 180 , -180 then "rotate3d(#{if isVert then '1, 0, 0' else '0, 1, 0'}, 180deg)" # back
+							when 270 , -90  then "rotate3d(#{if isVert then '1, 0, 0' else '0, 1, 0'}, 90deg)"  # top / right side
 
 					transition: () ->
-						active = @container.find(">div.active")
+						nextSlider = @container.find(">div.active")
 
-						oldIndex = @old_active.parent().prevAll().length
-						Index = active.parent().prevAll().length
+						currentIndex = @currentSlider.prevAll().length
 
+						@angle += if @reverse then 90 else -90
 
-						front_css = {
-							'position'          : 'absolute',
-							'top'               : 0,
-							'left'              : 0,
-							'-webkit-transform' : 'rotate3d(0, 1, 0, -90deg) translate3d(0px, 0px, 340px)',
-							'display'           : 'block',
-							'overflow'          : 'visible',
-							'z-index'           : 2
-						}
+						if @angle == 0 
+							@angle = if @reverse then 360 else -360
 
-						pair_css = {
-							'position'          : 'absolute',
-							'top'               : 0,
-							'left'              : 0,
-							'-webkit-transform' : 'rotate3d(0, 1, 0, 0deg) translate3d(0px, 0px, 340px)',
-							'display'           : 'block',
-							'overflow'          : 'visible'
-							'z-index'           : 1
-						}
+						@currentSlider
+							.css('z-index', 1)
+							.css("opacity", 0)
+							.css('-webkit-transition', "opacity 1s")
 
-						@deg = if @deg >= 270 then 0 else @deg + 90
-						rotate3_str = if @deg == 0 then "" else "rotate3d(0, 1, 0, #{@deg}deg)"
-						cont_css = {
-							'-webkit-transform'     : "translate3d(0px, 0px, -340px) #{rotate3_str}",
-						}
+						@sliders
+							.filter (i) => 
+								currentIndex != i
+							.css("-webkit-transform", "none")
+							.css("display", "none")
 
-						active.css(front_css)						
-						@old_active.css(pair_css)
-						@container.css(cont_css)
+						nextSlider
+							.css("webkit-transform", "#{@rotate3d(@angle)} translate3d(0px, 0px, #{@translateZ}px)")
+							.css("display", "block")
+							.css("opacity", 1)
+#							.css '-webkit-transition', "none"
+							.css("z-index", 2)
 
-					transitionFrom: (from, to) ->
+						@container.css "webkit-transform", "translate3d(0, 0 , -#{@translateZ}px) rotate3d(#{if @isVert then '1,0,0' else '0,1,0'},#{@angle}deg)"
 
+						if Math.abs(@angle) == 360
+							@container.css(
+								"webkit-transform",
+								"translate3d(0,0, -#{@translateZ}px)"
+							)
 
+							@angle = 0
+
+						@currentSlider = nextSlider
 
 					revertScene: () ->
 

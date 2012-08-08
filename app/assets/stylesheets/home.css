@@ -67,7 +67,29 @@
   bottom: -10px;
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
+  border-radius: 10px;
   z-index: 1;
   border-radius: 10px;  
   opacity: 0.5
+}
+
+.people.horizontal {
+  width: 200px;
+  height: 80px;
+  padding: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  background-color: #ccc
+}
+
+.people.vertical {
+  width: 80px;
+  height: 200px;
+  padding: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px; 
+  background-color: #ccc
+} 
 }

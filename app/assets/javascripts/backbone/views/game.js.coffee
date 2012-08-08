@@ -17,10 +17,84 @@ namespace "ChatRoom", (ex) ->
 
 		template: ChatRoom.template("games/hall")
 
+		events: {
+			"click .start-game": "start_game"
+		}
+
 		render: () ->
 			$(@el).html(@template())
+			window.Home.getContainer().registerView (context) =>
+				@game_view = new ex.GameRoomView(el: context.el)
+
+		start_game: () ->
+			window.Home.getContainer().switchView(@game_view)
+
+
 
 
 	class ex.GameRoomView extends Backbone.View
+		template: ChatRoom.template("games/game")
+
+		render: () ->
+			$(@el).html(@template())
+			directions = ["bottom", "left", "top", "right"]
+			players = [ @owner(), @waitPlayer(), @waitPlayer(), @waitPlayer() ]
+			@people_views = []
+			for i in [0...4]
+				pe = @make("div", {class: "people"}, "")
+				@$(".peoples").append(pe)
+				pv = new ex.PeopleCardView({
+						el: pe, 
+						direction: directions[i], 
+						model: players[i]
+					})
+				pv.render()
+
+				@people_views.push pv
+
+		owner: () ->
+			Home.current_user
+
+		waitPlayer: () ->
+			new ex.User
+
+	class ex.PeopleCardView extends Backbone.View
+		template: ChatRoom.template("games/people_card")
+
+		constructor: (@options) ->
+			_.extend(@, @options)
+			@$el = $(@el)
+
+			@direction ||= "bottom"
+			@container ||= $(@el).parent()
+
+			@model.on('change', @show, @)
+			# @model.fetch()
+		render: () ->
+			@$el.html(@template())
+
+			switch @direction
+				when "top", "bottom"
+					$(@el)
+						.addClass('horizontal')
+						.css("position", "absolute")
+						.css("left": "50%")
+						.css("margin-left", "-100px")
+						.css(@direction, 10)
 
 
+				when "left", "right"
+					$(@el)
+						.addClass('vertical')
+						.css("position", "absolute")
+						.css("top": "50%")
+						.css("margin-top", "-100px")
+						.css(@direction, 10)
+
+
+			@show(@model)
+
+
+		show: (model) ->
+
+			@$(".gravatar").attr("src", model.gravatar())

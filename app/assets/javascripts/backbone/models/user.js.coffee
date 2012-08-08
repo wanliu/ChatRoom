@@ -13,7 +13,21 @@
 
 namespace "ChatRoom", (exports) ->
 	class exports.User extends Backbone.Model
+		ASSEST_PREFIX = "/assets/"
 		urlRoot: "/users"
+
+		@current_user = ()->
+			user = new @
+			user.fetch url: "#{user.url()}/current_user"
+			user
+
+		gravatar_url: () ->
+			@attributes.gravatar || ASSEST_PREFIX + "nobody.jpeg"
+
+		gravatar: () ->
+			@gravatar_url()
+
+
 
 	class exports.OnlineUser extends exports.User
 
@@ -21,6 +35,8 @@ namespace "ChatRoom", (exports) ->
 	class exports.Users extends Backbone.Collection
 		url: "/users"
 		model: exports.User
+
+
 
 	class exports.OnlineUsers extends exports.Users
 		model: exports.OnlineUser

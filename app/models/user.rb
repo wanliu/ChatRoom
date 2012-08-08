@@ -11,6 +11,8 @@
 #
 # author: hysios@gmail.com
 
+require 'digest'
+
 class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :token_authenticatable, :confirmable,
@@ -21,6 +23,9 @@ class User < ActiveRecord::Base
   # Setup accessible (or protected) attributes for your model
   attr_accessible :nickname, :email, :password, :password_confirmation, :remember_me
   # attr_accessible :title, :body
+
+  attr_reader :gravatar
+
   has_one :room_member
   has_one :room, :through => :room_member
 
@@ -40,5 +45,14 @@ class User < ActiveRecord::Base
     room_member.detete
     save
     reload
+  end
+
+  def gravatar
+    "http://www.gravatar.com/avatar.php?gravatar_id=#{Digest::MD5::hexdigest(email)}"
+  end
+
+  def as_json(*args)
+    hash = super
+    hash.merge! :gravatar => gravatar
   end
 end

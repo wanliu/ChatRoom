@@ -21,14 +21,14 @@ namespace "Viewport", (ex) ->
 			_.extend(@, config)
 
 		switch: () ->
-			old_active = if @parent.find(">div.active")[0]? then @parent.find(">div.active") else @parent.find(">div:first-child")
+			old_active = @parent.find(">div.active")[0]
+
+			@parent.find(">div").removeClass("active")
+			$(@el).addClass("active").show()
+			@view && @view.render()
 
 			if old_active?
-				@container.effect.enterScene(old_active)
-
-				@parent.find(">div").removeClass("active")
-				$(@el).addClass("active")
-				@view && @view.render()
+				#@container.effect.enterScene()
 
 				@container.effect.transition()
 			#@container.effect.revertScene()
