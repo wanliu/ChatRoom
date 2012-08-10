@@ -26,7 +26,7 @@ ChatRoom::Application.routes.draw do
   match "/users/current_user", :to => "users#get_current_user"
   resources :users 
 
-
+  mount JasmineRails::Engine => "/specs" unless Rails.env.production?
 
   # See how all your routes lay out with "rake routes"
 

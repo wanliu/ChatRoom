@@ -27,6 +27,8 @@ namespace "ChatRoom", (exports) ->
 		gravatar: () ->
 			@gravatar_url()
 
+		display_name: () ->
+			@get("nickname") || @get("email")
 
 
 	class exports.OnlineUser extends exports.User

@@ -15,3 +15,5 @@
 /tmp
 /.sass-cache
 /vendor/bundle
+/.jhw-cache
+jhw.*.html
