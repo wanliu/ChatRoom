@@ -22,7 +22,7 @@
 //= require backbone_rails_sync
 //= require backbone_datalink
 //= require backbone/chat_room
-//= require lib/bezier
+//= require_tree ./lib
 //= require helpers
 
 
