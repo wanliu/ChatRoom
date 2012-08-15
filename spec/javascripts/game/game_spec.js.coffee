@@ -181,7 +181,6 @@ describe "Game Rules Define", () ->
 		it "parseExpression '[' deep nested [ 3, 4, [ 5 , 10 , [J , Q, [ K, A , 2, [Clown]], King]], 6]", () ->
 			results = @parser.parseExpression("[ 3, 4, [ 5 , 10 , [J , Q, [ K, A , 2, [Clown]], King]], 6]")
 
-			console.log results
 
 			expect(results[0]).toPattern(
 				[ @methodDisorder, 
@@ -207,8 +206,8 @@ describe "Game Rules Define", () ->
 					[ @methodEql, '6' ]
 				])
 
-		it "Other 1 parseExpression '[' deep nested [[[ 3, 4, ], 5 ], 6 ]" , () ->
-			results = @parser.parseExpression("[[[ 3, 4, ], 5 ], 6 ]")
+		it "Other 1 parseExpression '[' deep nested [[[ 3, 4 ], 5 ], 6 ]" , () ->
+			results = @parser.parseExpression("[[[ 3, 4 ], 5 ], 6 ]")
 			expect(results[0]).toPattern(
 				[ @methodDisorder,
 					[ @methodDisorder ,
@@ -221,7 +220,7 @@ describe "Game Rules Define", () ->
 					[ @methodEql, '6' ]
 				])
 
-		it "Other 2 parseExpression '['' deep nested [[[ 3 ], 5 ], 6 ]" , () ->
+		it "Other 2 parseExpression '[' deep nested [[[ 3 ], 5 ], 6 ]" , () ->
 			results = @parser.parseExpression("[[[ 3 ], 5 ], 6 ]")
 			expect(results[0]).toPattern(
 				[ @methodDisorder,
@@ -235,17 +234,15 @@ describe "Game Rules Define", () ->
 				])
 
 
-		it "Other 3 parseExpression  '['' deep nested [3, [4 , [ 5 ]]]" , () ->
-			results = @parser.parseExpression("[3, [4 , [ 5 ]]]")
+		it "Other 3 parseExpression  '[' deep nested [ 3, [ 4 ,[ 5 ]]]" , () ->
+			results = @parser.parseExpression("[ 3, [ 4 , [ 5 ]]]")
 			expect(results[0]).toPattern(
 				[ @methodDisorder,
 					[ @methodEql, '3' ],
 					[ @methodDisorder ,
-						[ @methodDisorder ,
-							[ @methodEql, '4' ],
-							[ @methodDisorder, 
-								[ @methodEql, '5' ]
-							]
+						[ @methodEql, '4' ],
+						[ @methodDisorder, 
+							[ @methodEql, '5' ]
 						]
 					]
 				])
@@ -256,16 +253,30 @@ describe "Game Rules Define", () ->
 				[ @methodDisorder,
 					[ @methodEql, '3' ],
 					[ @methodDisorder ,
-						[ @methodDisorder ,
-							[ @methodEql, '4' ],
-							[ @methodDisorder, 
-								[ @methodEql, '5' ],
-								[ @methodEql, '6' ]
-							]
+						[ @methodEql, '4' ],
+						[ @methodDisorder, 
+							[ @methodEql, '5' ],
+							[ @methodEql, '6' ]
 						]
 					]
 				])
 
+		it "Other 5 parseExpression '[' deep nested  [3, [4 , [ 5, [6]]], A]'  " , () ->
+			results = @parser.parseExpression(" [3, [4 , [ 5, [6]]], A]")
+			expect(results[0]).toPattern(
+				[ @methodDisorder,
+					[ @methodEql, '3' ],
+					[ @methodDisorder ,
+						[ @methodEql, '4' ],
+						[ @methodDisorder, 
+							[ @methodEql, '5' ],
+							[ @methodDisorder ,
+								[ @methodEql, '6' ]
+							]
+						]
+					],
+					[ @methodEql, 'A']
+				])			
 
 
 		it "parseExpression '[$A, $1, $1], $A?, $A?'", () ->
