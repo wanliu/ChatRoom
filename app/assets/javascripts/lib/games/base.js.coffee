@@ -127,38 +127,49 @@ namespace "Games", (ex) ->
 	class ex.PatternContext extends ex.Context
 		
 
-	COMMAND_WITH = /^\$/g
-	COMMAND_A_POKER = /^\$A/g
-	COMMAND_A_NUMBER = /^\$(\d+)/g
-	COMMAND_A_NAME = /^\$(\w+)/g
-	COMMAND_PREV = /^\$\</g
-	COMMAND_NORMAL_STRING = /(\w+)|(\d+)/g
+	COMMAND_WITH = /^\$/
+	COMMAND_A_POKER = /^\$A/
+	COMMAND_A_NUMBER = /^\$(\d+)/
+	COMMAND_A_NAME = /^\$(\w+)/
+	COMMAND_PREV = /^\$\</
+	COMMAND_NORMAL_STRING = /(\w+)|(\d+)/
 	COMMAND_START_BRACKET = /^\[/
 	COMMAND_END_BRACKET = /(.*?)\]/
+	COMMAND_PURE_END_BRACKET = /^\s*\]/
+	COMMAND_WORD_END_BRACKET = /^([a-z|A-Z|0-9| '"\+\\\\=\-]+\])/
 	COMMAND_OPERATOR_NUMBER = /(\+|\-|\*|\/)(\d+)/
 	COMMAND_OPTION = /\?/
+	COMMAND_NEXT_COMMA = /(.*?)\,/
+
+	PATTERN_NORMAL_NAME = /^(\w+)$/
+	PATTERN_WITH = /^(\||\&)(\w+)/
 
 	class ex.Executor
 		constructor: (@context) ->
 
 		or: (args...) ->
+			"or"
 	
 		pick: () ->
+			"pick"
 
 		pickEql: (number) ->
+			"pickEql#{number}"
 
 		pattern: (name) ->
+			"pattern:#{name}"
 
 		eql: (value) ->
+			"eql:#{value}"
 
 		disorder: (array...) ->
+			"disorder"
 
 		prevValue: (number) ->
+			"prevValue: #{number}"
 
 		calc: (op, func, value ) ->
-
-
-
+			"calc: #{op}, #{func}, #{value}"
 
 	class ex.GroupParser
 
@@ -167,7 +178,7 @@ namespace "Games", (ex) ->
 
 		}
 
-		constructor: (@groups, @executor) ->
+		constructor: (@executor = new Games.Executor, @groups = {}) ->
 			@context = @getContext()
 
 		getContext: () ->
@@ -175,12 +186,43 @@ namespace "Games", (ex) ->
 
 			context.old_push = context.push
 
+			parser = @
+
 			_.extend(context, {
-				push: (object) ->
-					object.parent = @ if _.isArray(object)
-					@old_push(object)
+				push: (args...) ->
+					for a in args
+						a.parent = @ if _.isArray(a)
+					@old_push.apply(@, args)
 
 				warp: (object) ->
+
+
+				orJoin: (pattern) ->
+					or_func = parser.newFunc("or")
+
+					members = @splice(0, @length)
+
+					or_func = or_func.concat (members)
+					or_func.push pattern
+
+					@unshift(or_func)
+					@
+
+
+				andJoin: (pattern) ->
+					@push(pattern)
+					@
+
+				orConcat: (pattern) ->
+					or_func = parser.newFunc("or")
+					members = @splice(0, @length)
+					@push or_func[0], members, pattern
+					@
+
+				andConcat: (pattern) ->
+					@push pattern
+					@
+
 
 			})
 
@@ -193,32 +235,84 @@ namespace "Games", (ex) ->
 		newFunc: (name, args...) ->
 			p = @getContext()
 			p.push @executor[name]
-			p.concat args if args.length > 0
+			p = p.concat(args) if args.length > 0
 			p
+
+		nextExp: (exps) ->
+			# xxx ]
+			if COMMAND_WORD_END_BRACKET.test(exps)
+				next = COMMAND_WORD_END_BRACKET.exec(exps)[1]
+				[ next.trim(), RegExp.rightContext ]
+			# xxx, 
+			else if COMMAND_NEXT_COMMA.test(exps) 
+				next = COMMAND_NEXT_COMMA.exec(exps)[1]
+				[ next.trim(), RegExp.rightContext ]
+			# [ xxx 
+			else if COMMAND_START_BRACKET.test(exps)
+				[ '[', RegExp.rightContext ]
+			# ]]]
+			else if COMMAND_PURE_END_BRACKET.test(exps)
+				[ ']', RegExp.rightContext ]
+			# xxx
+			else
+				[ exps, ""]
 
 		findOrCreatePattern: (name, context = @context) ->
 			pattern = _(context).find () ->
 				patt.name == name
-			pattern ||= newPattern(name)
+			pattern ||= @newPattern(name)
 
-		parse: (groups = @groups, context = @context) ->
-			for name, exp in groups
-				pattern = @findOrCreatePattern(name, context)
-				pattern.push(@parseSections(exp, context))
+		parse: (groups = @groups, context = []) ->
+			relations = {
+				'|': 'or'
+				'&': 'and'
+			}
+			for name, exp of groups
+				rel = 'and'
+				if PATTERN_WITH.test(name)
+					[x, symbol, name] = PATTERN_WITH.exec(name)
 
-		parseSections: (sections, context) ->
-			if _.isArray(sections)
+					rel = relations[symbol]
+					throw "Parse Error! Invalid relation symbol: #{symbol} " unless rel 
+
+				else if !PATTERN_NORMAL_NAME.test(name)
+					throw "Parse Error! Invalid Pattern Name: #{name}"
+
+				item = _(context).find (it) ->
+					it.name == name
+
+				unless item?
+					item = @newPattern(name)
+					context.push item
+
+				rel_method = item["#{rel}Concat"]
+				rel_method.call(item, @parseSections(exp))
+ 
+			context
+
+		parseSections: (sections) ->
+				
+			if _.isArray(sections) && sections.length > 1
 				pattern = @newFunc("or")
 				for section in sections
-					pattern.push @parseSections(section, pattern)
+					pattern.push @parseSections(section)
+				pattern
 			else
-				@parseExpression(sections, context)
+				sections = sections[0] if _.isArray(sections)
+				@parseExpression(sections)
 
-		parseExpression: (exps, context) ->
-			expressions = exps.split(",")
+		parseExpression: (exps) ->
+			context = @getContext()
 
-			for exp in expressions
-				@parseCommand(exp, context)
+			while ([next_exp, exps ] = @nextExp(exps)).length > 0 && next_exp != ""
+				if COMMAND_START_BRACKET.test(next_exp)
+					[brackets, exps] = @parseBrackets(RegExp.rightContext + ',' + exps)
+					context.push brackets
+				else
+					context.push @parseCommand(next_exp, context)
+
+			context
+
 
 		# 	"DOUBLE"      : "$A,$1"
 		# 	Double = [ [pick], [ pickEql, 1 ]]
@@ -247,11 +341,11 @@ namespace "Games", (ex) ->
 
 		#	"DRAGON"	  : "[$A, $<+1, $<+1, $<+1, $<+1 ]"
 		#	Dragon = [ discorder, 
-		# 				[[pick], 
+		# 				 [pick], 
 		#	 			 [calc, '+', [pickPrevEql], 1], 
 		#				 [calc, '+', [pickPrevEql], 1], 
 		# 				 [calc, '+', [pickPrevEql], 1],
-		# 				 [calc, '+', [pickPrevEql], 1]]
+		# 				 [calc, '+', [pickPrevEql], 1]
 		# 			]
 
 		# 	"DOUBLE_KING" :	"$KING,$KING"
@@ -261,46 +355,73 @@ namespace "Games", (ex) ->
 		# 	]	
 		#
 
-		parseCommand: (exp, context) ->
+		parseCommand: (exp) ->
 			# control string command
+			exp = exp.trim()
 			if COMMAND_WITH.test(exp)
 				# "$A"
 				func = if COMMAND_A_POKER.test(exp)
-					newFunc("pick")
+					@newFunc("pick")
 				# "$1"
 				else if COMMAND_A_NUMBER.test(exp)
 					number = COMMAND_A_NUMBER.exec(exp)[1]
-					newFunc("pickEql", number)
+					@newFunc("pickEql", number)
 				# "$NAME"
 				else if COMMAND_A_NAME.test(exp)
 					name = COMMAND_A_NAME.exec(exp)[1]
-					newFunc("pattern", name)
-				# "[5, 10, K]" disorder group
-				else if COMMAND_START_BRACKET(exp) 
-					last = RegExp.rightContext
-					func = newFunc("disorder")
-					func.push @parseCommand(last)
-				# "]"
+					@newFunc("pattern", name)
 				else if COMMAND_END_BRACKET.test(exp) 
-					[]
+					throw "Parse Error, mismatch bracket `]`"
 				# "$<"
 				else if COMMAND_PREV.test(exp)
-					newFunc("prevValue")
+					@newFunc("prevValue")
 				else
 					throw "ErrorCommand"
 				
-				# [calc, '+', [prevValue], 1],
-				while (last = RegExp.rightContext)?
+				while (last = RegExp.rightContext.trim()) != '' && last?
 					func = if COMMAND_OPERATOR_NUMBER.test(last)
 						[__, op, value] = COMMAND_OPERATOR_NUMBER.exec(last)
-						newFunc("calc", op, func, value)
+						@newFunc("calc", op, func, value)
 					else if COMMAND_OPTION.test(last)
-						newFunc("or", func)
+						@newFunc("or", func)
+					else
+						throw "ParseError ,Invalid Format"
 
 			else # word
-				func = newFunc("eql", exp)
+				func = @newFunc("eql", exp)
+
+			throw "Parse Error , invalid command #{exp}" unless func?
 
 			func
+
+		parseBrackets: (exps) ->
+			func = @newFunc("disorder")
+			while ([next_exp, exps ] = @nextExp(exps)).length > 0 && next_exp != ""
+				console.log "#{next_exp} : #{exps}"
+
+				if COMMAND_START_BRACKET.test(next_exp)
+					[nested, exps ] =  @parseBrackets(RegExp.rightContext + ',' + exps)
+					func.push nested
+					if COMMAND_END_BRACKET.test(next_exp)
+						return [func, exps]
+					else
+						continue
+
+				if COMMAND_PURE_END_BRACKET.test(next_exp)
+					return [func, exps]
+				else if COMMAND_END_BRACKET.test(next_exp)
+					exp = COMMAND_END_BRACKET.exec(next_exp)[1]
+					func.push(this.parseCommand(exp)) if exp != "" &&  exp?
+					return [func, exps]
+
+				else
+					exp = next_exp
+
+				func.push @parseCommand(exp)
+
+			[func, exps]
+
+
 
 	class Tree
 		constructor: (@tree) ->
@@ -355,13 +476,11 @@ namespace "Games", (ex) ->
 
 		or: (_values, args) ->
 			value = _values[0]
-			console.log "or", args
 			_.any args, (arg) -> arg == value
 
 
 		and: (_values, args) ->
 			value = _values[0]
-			console.log "and", args
 			_.all args, (arg) -> arg == value
 
 	class ex.GroupValidate
