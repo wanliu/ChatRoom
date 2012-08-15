@@ -133,10 +133,12 @@ namespace "Games", (ex) ->
 	COMMAND_A_NAME = /^\$(\w+)/
 	COMMAND_PREV = /^\$\</
 	COMMAND_NORMAL_STRING = /(\w+)|(\d+)/
-	COMMAND_START_BRACKET = /^\[/
+	COMMAND_START_BRACKET = /^\s*\[/
 	COMMAND_END_BRACKET = /(.*?)\]/
 	COMMAND_PURE_END_BRACKET = /^\s*\]/
-	COMMAND_WORD_END_BRACKET = /^([a-z|A-Z|0-9| '"\+\\\\=\-]+\])/
+	COMMAND_DOUBLE_BRACKET = /^\s*(\])\s*\]/
+	COMMAND_BRACKET_COMMA = /^\s\]\,/
+	COMMAND_WORD_END_BRACKET = /^([a-z|A-Z|0-9| '"\+\\\\=\-\$\>\<]+)\]/
 	COMMAND_OPERATOR_NUMBER = /(\+|\-|\*|\/)(\d+)/
 	COMMAND_OPTION = /\?/
 	COMMAND_NEXT_COMMA = /(.*?)\,/
@@ -239,6 +241,29 @@ namespace "Games", (ex) ->
 			p
 
 		nextExp: (exps) ->
+			# [ xxx 
+			if COMMAND_START_BRACKET.test(exps)
+				[ '[', RegExp.rightContext ]			
+			# xxx ]
+			else if COMMAND_WORD_END_BRACKET.test(exps)
+				next = COMMAND_WORD_END_BRACKET.exec(exps)[1]
+				[ next.trim(), ']' + RegExp.rightContext ]
+			# ]] 
+			else if COMMAND_DOUBLE_BRACKET.test(exps)
+				next = COMMAND_DOUBLE_BRACKET.exec(exps)[1]
+				[ next.trim(), ']' + RegExp.rightContext ]
+			# xxx, 
+			else if COMMAND_NEXT_COMMA.test(exps) 
+				next = COMMAND_NEXT_COMMA.exec(exps)[1]
+				[ next.trim(), RegExp.rightContext ]
+			# ]]]
+			else if COMMAND_PURE_END_BRACKET.test(exps)
+				[ ']', RegExp.rightContext ]
+			# xxx
+			else
+				[ exps, ""]
+
+		nextExp2: (exps) ->
 			# xxx ]
 			if COMMAND_WORD_END_BRACKET.test(exps)
 				next = COMMAND_WORD_END_BRACKET.exec(exps)[1]
@@ -255,7 +280,7 @@ namespace "Games", (ex) ->
 				[ ']', RegExp.rightContext ]
 			# xxx
 			else
-				[ exps, ""]
+				[ exps, ""]				
 
 		findOrCreatePattern: (name, context = @context) ->
 			pattern = _(context).find () ->
@@ -306,7 +331,7 @@ namespace "Games", (ex) ->
 
 			while ([next_exp, exps ] = @nextExp(exps)).length > 0 && next_exp != ""
 				if COMMAND_START_BRACKET.test(next_exp)
-					[brackets, exps] = @parseBrackets(RegExp.rightContext + ',' + exps)
+					[brackets, exps] = @parseBrackets(exps)
 					context.push brackets
 				else
 					context.push @parseCommand(next_exp, context)
@@ -394,10 +419,9 @@ namespace "Games", (ex) ->
 
 			func
 
-		parseBrackets: (exps) ->
+		parseBrackets2: (exps) ->
 			func = @newFunc("disorder")
 			while ([next_exp, exps ] = @nextExp(exps)).length > 0 && next_exp != ""
-				console.log "#{next_exp} : #{exps}"
 
 				if COMMAND_START_BRACKET.test(next_exp)
 					[nested, exps ] =  @parseBrackets(RegExp.rightContext + ',' + exps)
@@ -421,7 +445,24 @@ namespace "Games", (ex) ->
 
 			[func, exps]
 
+		parseBrackets: (exps) ->
+			func = @newFunc("disorder")
+			while ([next_exp, exps ] = @nextExp(exps)).length > 0 && next_exp != ""
 
+				if COMMAND_START_BRACKET.test(next_exp)
+					[nested, exps ] =  @parseBrackets(exps)
+					func.push nested
+					continue
+
+				if COMMAND_PURE_END_BRACKET.test(next_exp)
+					return [func, exps]
+
+				else
+					exp = next_exp
+
+				func.push @parseCommand(exp)
+
+			[func, exps]
 
 	class Tree
 		constructor: (@tree) ->
