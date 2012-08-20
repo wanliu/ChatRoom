@@ -11,17 +11,30 @@ class Ability
     #     can :read, :all
     #   end
 
-    user ||=User.new
-    if user.role :superboss
-        can :manage, :all
-    elsif user.role :admin
+    @user ||=User.new
+    @user.role.each {|role| send(role)}
+
+#admin or the room_holder mute him that he can only watch
+    def primary_room_member
+        can :watch
+    end
+
+    def room_member
+        can :speak
+    end
+
+    def admin
+        room_member
         can :kick,      :user
-        can :set_admin, :user
         can :mute,      :user
         can :dismute,   :user
-    else
-        nil
     end
+
+    def room_holder
+        admin
+        can :set_admin, :user
+    end
+
     #
     # The first argument to `can` is the action you are giving the user permission to do.
     # If you pass :manage it will apply to every action. Other common actions here are
