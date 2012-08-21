@@ -14,6 +14,8 @@
 require 'digest'
 
 class User < ActiveRecord::Base
+  ROLES = %w[admin moderator author banned]
+
   # Include default devise modules. Others available are:
   # :token_authenticatable, :confirmable,
   # :lockable, :timeoutable and :omniauthable
@@ -55,31 +57,34 @@ class User < ActiveRecord::Base
     hash = super
     hash.merge! :gravatar => gravatar
   end
-#To stop him from speaking a word
-#stuck
-  def watch
-    
-  end
-#just nil
-  def speak
 
-  end
-
+  #the admin or above action
   def kick
     leave
     redirect_to hall_path
     flash[:notice] = "You\'ve been kicked out of the room"
   end
-  #set the room_member to primary_room_member may be a better way
+  #add a muted boolean to restrict the user's permission to say or not
   def mute
-    @user.watch
+    @user.muted = false
     flash[:notice] = 'You have been muted!!!'
   end
-  #the same as the above 
+  #the same as the above
   def dismute
-    @user.speak
+    @user.muted = true
     flash[:notice] = 'You have been dismuted  :)'
   end
+
+  def roles=(roles)
+    self.roles_mask = (roles & ROLES).map { |r| 2**ROLES.index(r) }.inject(0, :+)
+  end
+
+  def roles
+    ROLES.reject do |r|
+      ((roles_mask || 0) & 2**ROLES.index(r)).zero?
+    end
+  end
+
 
   def set_admin
     

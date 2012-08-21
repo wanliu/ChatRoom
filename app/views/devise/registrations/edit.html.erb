@@ -19,13 +19,6 @@
   <%= f.password_field :current_password %></div>
 
   <div><%= f.submit t(:update), :class => 'btn btn-primary' %></div>
-<!-- something have to ask if it's right or not, how to use the method -->
-  <% if can? :mute, @user %>
-    <div><%= f.submit t(:mute), :class => 'btn btn-primary' %></div>
-    <div><%= f.submit t(:dismute), :class => 'btn btn-primary' %></div>
-    <div><%= f.submit t(:kick), :class => 'btn btn-primary' %></div>
-  <% end %>
-<% end %>
 
 <h3>Cancel my account</h3>
 

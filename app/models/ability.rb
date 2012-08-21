@@ -11,28 +11,21 @@ class Ability
     #     can :read, :all
     #   end
 
-    @user ||=User.new
-    @user.role.each {|role| send(role)}
+    @user ||= User.new
+    @user.roles.each { |role| send(role)}
+  end
 
-#admin or the room_holder mute him that he can only watch
-    def primary_room_member
-        can :watch
-    end
-
-    def room_member
-        can :speak
-    end
+    #admin or the room_holder mute him that he can only watch
 
     def admin
-        room_member
-        can :kick,      :user
-        can :mute,      :user
-        can :dismute,   :user
+      can :kick,      User
+      can :mute,      [User]
+      can :dismute,   [User]
     end
 
     def room_holder
-        admin
-        can :set_admin, :user
+      admin
+      can :set_admin, [User]
     end
 
     #
@@ -49,5 +42,4 @@ class Ability
     #   can :update, Article, :published => true
     #
     # See the wiki for details: https://github.com/ryanb/cancan/wiki/Defining-Abilities
-  end
 end

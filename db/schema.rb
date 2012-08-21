@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120731031009) do
+ActiveRecord::Schema.define(:version => 20120821024147) do
 
   create_table "profiles", :force => true do |t|
     t.datetime "created_at", :null => false
@@ -58,6 +58,7 @@ ActiveRecord::Schema.define(:version => 20120731031009) do
     t.datetime "created_at",                                           :null => false
     t.datetime "updated_at",                                           :null => false
     t.string   "nickname",               :limit => 25
+    t.integer  "roles_mask"
   end
 
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true

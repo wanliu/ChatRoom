@@ -30,4 +30,18 @@ class UsersController < ApplicationController
   def get_current_user
     respond_with current_user
   end
+
+  def kick
+    room_member.delete
+    save
+    reload
+  end
+  #add a muted boolean to restrict the user's permission to say or not
+  def mute
+    @user.muted = false
+  end
+  #the same as the above
+  def dismute
+    @user.muted = true
+  end
 end
