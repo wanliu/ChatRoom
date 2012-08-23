@@ -78,6 +78,8 @@ GEM
     eventmachine (0.12.10)
     execjs (1.4.0)
       multi_json (~> 1.0)
+    factory_girl (4.0.0)
+      activesupport (>= 3.0.0)
     ffi (1.1.5)
     hike (1.2.1)
     hirb (0.7.0)
@@ -195,6 +197,7 @@ DEPENDENCIES
   debugger
   devise
   devise-i18n
+  factory_girl
   hirb
   jasmine-headless-webkit!
   jasmine-rails

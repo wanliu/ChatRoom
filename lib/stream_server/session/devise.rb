@@ -13,7 +13,7 @@ module StreamServer
         session["warden.user.user.key"]
       end
 
-      def uniq_key_name 
+      def uniq_key_name
         session_key[1..2].join()
       end
 
@@ -32,7 +32,7 @@ module StreamServer
           Rails.cache.fetch "session_record_#{session_id}" , :expires_in => 5.minutes do 
             ActiveRecord::SessionStore::Session.find_by_session_id(session_id)
           end
-        end      
+        end
     end
   end
 end

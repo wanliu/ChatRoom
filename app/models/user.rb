@@ -21,9 +21,11 @@ class User < ActiveRecord::Base
   # :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
+  
 
   # Setup accessible (or protected) attributes for your model
-  attr_accessible :nickname, :email, :password, :password_confirmation, :remember_me
+  attr_accessible :nickname, :email, :password, 
+                  :password_confirmation, :remember_me, :muted
   # attr_accessible :title, :body
 
   attr_reader :gravatar
@@ -59,21 +61,6 @@ class User < ActiveRecord::Base
   end
 
   #the admin or above action
-  def kick
-    leave
-    redirect_to hall_path
-    flash[:notice] = "You\'ve been kicked out of the room"
-  end
-  #add a muted boolean to restrict the user's permission to say or not
-  def mute
-    @user.muted = false
-    flash[:notice] = 'You have been muted!!!'
-  end
-  #the same as the above
-  def dismute
-    @user.muted = true
-    flash[:notice] = 'You have been dismuted  :)'
-  end
 
   def roles=(roles)
     self.roles_mask = (roles & ROLES).map { |r| 2**ROLES.index(r) }.inject(0, :+)
@@ -85,8 +72,4 @@ class User < ActiveRecord::Base
     end
   end
 
-
-  def set_admin
-    
-  end
 end

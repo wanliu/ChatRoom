@@ -40,6 +40,6 @@ module StreamServer
       else
         raise GeneratorArgumentMismatch.new("klass is only Class, String, Symbol")
       end
-    end      
+    end
   end
 end

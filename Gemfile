@@ -54,3 +54,5 @@ gem "thin"
 
 # To use debugger
 gem 'debugger'
+
+gem 'factory_girl'

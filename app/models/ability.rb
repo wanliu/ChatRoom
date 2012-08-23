@@ -18,14 +18,16 @@ class Ability
     #admin or the room_holder mute him that he can only watch
 
     def admin
-      can :kick,      User
-      can :mute,      [User]
-      can :dismute,   [User]
+      can :kick, :mute, :dismute,  Room do |room|
+        @user == room.user
+      end
     end
 
     def room_holder
       admin
-      can :set_admin, [User]
+      can :set_admin, Room do |room|
+        @user == room.user
+      end
     end
 
     #

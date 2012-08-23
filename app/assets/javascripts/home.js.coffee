@@ -130,7 +130,6 @@ namespace "ChatRoom", (exports) ->
 
 
 		fly: ()->
-			
 			return @flyDone() if @percent < 0
 			@percent -= 0.01
 			pos = ChatRoom.Math.getBezier(@percent, @startPos, @endPos, @control1, @control2)

@@ -1,10 +1,10 @@
 module StreamServer
   class Connection
-    include Session    
+    include Session
     attr_reader :stream, :request
 
     alias_method :user, :current_user
-    
+
     def self.fetch(stream, request)
       new(stream, request)
     end

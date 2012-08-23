@@ -1,7 +1,7 @@
 module StreamServer
   module Dispatcher
     class Base
-      cattr_accessor :global_connections
+      attr_accessor :global_connections
       @@global_connections = []
 
       attr_accessor :connections, :handler
@@ -10,14 +10,14 @@ module StreamServer
 
         yield(self) if block_given?
       end
-  
+
       def add_connection(stream, request)
         conn = Connection.fetch(stream, request)
         global_connections.delete_if { |c| c.user == conn.user }
         global_connections << conn
       end
 
-      def global_connections 
+      def global_connections
         @@global_connections
       end
 
@@ -35,7 +35,7 @@ module StreamServer
         204 # response without entity body
       end
 
-      private 
+      private
         def params
           @params = (@request && @request.params) || {}
         end
@@ -49,7 +49,7 @@ module StreamServer
 
         def user_stream(user)
           user_connection(user).stream
-        end 
+        end
 
         def current_stream
           user_connection(current_user).stream
