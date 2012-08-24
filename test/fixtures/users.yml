@@ -9,3 +9,15 @@ hysios:
     id: 1
     email: "hysios@gmail.com"
     encrypted_password: "$2a$10$W0yGJB3K1l9S1Fl6DSCBTu48hGSrFgFY/HE8ET0/jFZihNCByz4sy"
+
+#the following created by Jzl
+one:
+  provider: MyString
+  uid: MyString
+  name: MyString
+
+two:
+  provider: MyString
+
+  uid: MyString
+  name: MyString

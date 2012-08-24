@@ -58,6 +58,8 @@ ActiveRecord::Schema.define(:version => 20120823074311) do
     t.datetime "created_at",                                           :null => false
     t.datetime "updated_at",                                           :null => false
     t.string   "nickname",               :limit => 25
+    t.string   "uid"
+    t.string   "provider"
     t.integer  "friends"
   end
 

@@ -35,7 +35,13 @@
           <li><a href="#hall"><%= t :hall %></a></li>
           <li><a href="#help"><%= t :help %></a></li>
           <li><a href="#contact">Contact</a></li>
-          <li><%= link_to "Sign Out", destroy_user_session_path %></li>
+          <li>
+            <% if session["warden.user.user.key"].blank? %>
+              <%= link_to "Sign Out", destroy_user_session_path %>
+            <% else %>
+              <%= link_to "Sign Out", signout_path %>
+            <% end %>
+          </li>
           <% unless current_user.blank? %>
           <li><%= link_to current_user.email, edit_user_registration_path %></li>
           <% end %>
@@ -46,6 +52,8 @@
 </div>
 <div class='container'>
   <div id="layout"></div>
+    <div style="color: green"><%= flash[:notice] %></div>
+    <div style="color: red"><%= flash[:alert] %></div>
   	<%= yield %>
   </div>
 </div>

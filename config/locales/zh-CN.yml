@@ -211,3 +211,6 @@ zh-CN:
         remember_me: "记住我"
         password_confirmation: "重复密码"
         current_password: "当前密码"
+#    errors:
+#      messages:
+#        record_invalid: "所请求的数据不存在！"

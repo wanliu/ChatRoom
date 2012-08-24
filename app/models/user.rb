@@ -21,7 +21,8 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable
 
   # Setup accessible (or protected) attributes for your model
-  attr_accessible :nickname, :email, :password, :password_confirmation, :remember_me
+  attr_accessible :nickname, :email, :password, :password_confirmation, :remember_me,
+                  :uid, :provider
   # attr_accessible :title, :body
 
   attr_reader :gravatar
@@ -56,5 +57,16 @@ class User < ActiveRecord::Base
   def as_json(*args)
     hash = super
     hash.merge! :gravatar => gravatar
+  end
+
+  # created by Jzl
+  def self.create_with_omniauth(auth)
+    #binding.pry
+    create! do |user|
+      user.provider = auth["provider"]
+      user.uid = auth["uid"]
+      user.email = auth["info"]["email"] + " from "+ user.provider
+      user.password = Devise.friendly_token[0,20]
+    end
   end
 end
