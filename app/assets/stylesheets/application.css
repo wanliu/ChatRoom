@@ -11,11 +11,10 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  
  * author: hysios@gmail.com *
- *= require bootstrap
- *= require fbody
- *= require responsive
+ *= require app-bootstrap
  *= require_self
  */
+
 
 
 [class^="icon-"],

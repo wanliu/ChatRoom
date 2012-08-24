@@ -14,7 +14,7 @@
 //= require jquery
 //= require jquery_ujs
 //= require modernizr
-//= require bootstrap
+//= require twitter/bootstrap
 //= require underscore
 //= require namespace
 //= require mixable
