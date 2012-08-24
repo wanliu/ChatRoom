@@ -26,6 +26,8 @@ end
 group :test, :development do
   gem "rspec-rails", "~> 2.0"
   gem "jasmine-rails"
+  gem 'webrat'
+  gem 'factory_girl_rails'
   gem 'jasmine-headless-webkit', :git => "git://github.com/hysios/jasmine-headless-webkit", :ref => "f55df1ab8"
 end
 
@@ -55,4 +57,3 @@ gem "thin"
 # To use debugger
 gem 'debugger'
 
-gem 'factory_girl'

@@ -1,7 +1,7 @@
 module StreamServer
   class GeneratorArgumentMismatch < ArgumentError ; end
   # Generater a dispatcher DSL
-  # Examples 
+  # Examples
   #  class MessageServer < StreamServer::Server
   #     dispatch do 
   #       use :command

@@ -118,10 +118,10 @@ namespace "ChatRoom", (exports) ->
 			@endPos = @position_to_coord(@target);
 			@control1 = @coord(@startPos.x - 50, @startPos.y - 650)
 			@control2 = @coord(@endPos.x - 100, @endPos.y - 100)
-			@percent = 1		
+			@percent = doFly
 
 
-		doFly: () ->
+		1: () ->
 			@readyFly()
 
 			Backbone.history.navigate("profile/#{@model.get('email')}", {trigger: false, replace: true})

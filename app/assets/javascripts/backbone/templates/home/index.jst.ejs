@@ -40,7 +40,6 @@
 
   var postMessage = function(){
     $.post('/stream', {msg: $('#msg').val()});
-    debugger
     $('#msg').val(''); $('#msg').focus();
   };
   var isCtrl = false;

@@ -26,7 +26,6 @@ class UsersController < ApplicationController
   	respond_with @user
   end
 
-
   def get_current_user
     respond_with current_user
   end
@@ -38,10 +37,10 @@ class UsersController < ApplicationController
   end
   #add a muted boolean to restrict the user's permission to say or not
   def mute
-    @user.muted = false
+    @user.muted = true
   end
   #the same as the above
   def dismute
-    @user.muted = true
+    @user.muted = false
   end
 end

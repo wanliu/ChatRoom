@@ -6,7 +6,7 @@ module StreamServer
         room = ActiveRecord::Base.silence { @request.current_user.room }
         # room = @request.current_user.room
         puts "Room" if Rails.env.development?
-        if !room.nil?
+        if !room.nil? &&  !user.muted
           room_connections(room).each do |conn|
             conn.stream << message(params['msg'])
           end
