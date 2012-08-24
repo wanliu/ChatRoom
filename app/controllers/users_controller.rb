@@ -26,8 +26,7 @@ class UsersController < ApplicationController
   	respond_with @user
   end
 
-
   def get_current_user
     respond_with current_user
-  end  
+  end
 end

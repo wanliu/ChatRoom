@@ -33,6 +33,17 @@ gem 'devise-i18n'
 gem 'anjlab-bootstrap-rails', '>= 2.0', :require => 'bootstrap-rails'
 gem "rails-backbone"
 gem 'hirb'
+
+#the following created by Jzl
+gem 'nifty-generators'
+gem 'omniauth'
+gem 'omniauth-twitter'
+gem 'omniauth-github'
+gem 'omniauth-google-oauth2'
+gem 'pry'
+gem 'pry-nav'
+gem 'rails-i18n'
+
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
 
@@ -51,3 +62,4 @@ gem "thin"
 
 # To use debugger
 gem 'debugger'
+
