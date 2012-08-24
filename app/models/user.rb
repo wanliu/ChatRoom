@@ -42,7 +42,9 @@ class User < ActiveRecord::Base
   end
 
   def leave
-    room_member.detete
+    return false if room_member.blank?
+
+    room_member.delete
     save
     reload
   end
