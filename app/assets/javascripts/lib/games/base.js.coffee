@@ -150,28 +150,109 @@ namespace "Games", (ex) ->
 		constructor: (@context) ->
 
 		or: (args...) ->
-			"or"
+			# console.log "or"
+			_(args).any (p) =>
+				@callPattern(p)
 	
 		pick: () ->
-			"pick"
+			# console.log "pick"
+			a = @input.readOne()
+			a? && a != "" && @storage.push(a) > 0
 
 		pickEql: (number) ->
-			"pickEql#{number}"
+			# console.log "pickEql#{number}"
+			@storage[number]? && @storage[number] == @input.readOne()
 
 		pattern: (name) ->
-			"pattern:#{name}"
+			# console.log "pattern:#{name}"
+			p = @getPattern(name)
+			throw "Invalid pattern name: #{name}" unless p?
+			@callPattern(p)
 
 		eql: (value) ->
-			"eql:#{value}"
+			# console.log "eql:#{value}"
+			value? && @input.readOne() == value
 
 		disorder: (array...) ->
-			"disorder"
+			# console.log "disorder"
+			false
 
 		prevValue: (number) ->
-			"prevValue: #{number}"
+			# console.log "prevValue: #{number}"
+			false
 
 		calc: (op, func, value ) ->
-			"calc: #{op}, #{func}, #{value}"
+			# console.log "calc: #{op}, #{func}, #{value}"
+			false
+
+	class ex.InputReader
+		constructor: (@inputs) ->
+			@current = _.clone(@inputs)
+
+		readOne: () ->
+			@current.shift()
+
+	class ex.ExecutorRunner
+		constructor: (@executor, @context) ->
+
+		unwrap: (pattern) ->
+			if _.isArray(pattern) && pattern.length == 1 && _.isArray(pattern[0])
+				pattern = pattern[0] 
+				@unwrap(pattern)
+			else if _.isArray(pattern) && pattern.length == 1
+				pattern = pattern[0]
+			else
+				pattern
+
+		execute: (inputs, contexts = @context) ->
+			if _.isArray(contexts)
+				# 获取每一行 pattern
+				for pattern in contexts
+					pattern = @unwrap(pattern)
+					# 每个 Sections
+					if @isFunction(pattern)
+						return pattern if @callFunc(pattern, inputs)
+					else if _.isArray(pattern)
+						success = _(pattern).all (p) =>
+							@callFunc(p, inputs) if @isFunction(p)
+						return pattern if success
+			[]
+
+
+		isFunction: (pattern) ->
+			if _.isArray(pattern) 
+				[func, args...] = pattern
+				return _.isFunction(func)
+			false
+
+		callFunc: (pattern, inputs, parent) ->
+			[func, args...] = pattern
+			parent ||= pattern
+
+			if _.isFunction(func) 
+				context = new ex.ExecutorContext(inputs, @context, @, parent)
+				func.apply(context, args)
+			else
+				_(pattern).all (p) =>
+					@callFunc(p, inputs, pattern)
+
+
+
+
+	class ex.ExecutorContext
+		constructor: (@inputs, @patterns, @runner, @current_pattern) ->
+			@input = new ex.InputReader(@inputs)
+			@current_pattern.storage ||= []
+			@storage = @current_pattern.storage
+
+		getPattern: (name) ->
+			_(@patterns).find (patt) ->
+				patt.name == name
+	
+		callPattern: (pattern) ->
+			@runner.callFunc(pattern, @inputs)
+
+
 
 	class ex.GroupParser
 
@@ -195,9 +276,6 @@ namespace "Games", (ex) ->
 					for a in args
 						a.parent = @ if _.isArray(a)
 					@old_push.apply(@, args)
-
-				warp: (object) ->
-
 
 				orJoin: (pattern) ->
 					or_func = parser.newFunc("or")
@@ -262,25 +340,6 @@ namespace "Games", (ex) ->
 			# xxx
 			else
 				[ exps, ""]
-
-		nextExp2: (exps) ->
-			# xxx ]
-			if COMMAND_WORD_END_BRACKET.test(exps)
-				next = COMMAND_WORD_END_BRACKET.exec(exps)[1]
-				[ next.trim(), RegExp.rightContext ]
-			# xxx, 
-			else if COMMAND_NEXT_COMMA.test(exps) 
-				next = COMMAND_NEXT_COMMA.exec(exps)[1]
-				[ next.trim(), RegExp.rightContext ]
-			# [ xxx 
-			else if COMMAND_START_BRACKET.test(exps)
-				[ '[', RegExp.rightContext ]
-			# ]]]
-			else if COMMAND_PURE_END_BRACKET.test(exps)
-				[ ']', RegExp.rightContext ]
-			# xxx
-			else
-				[ exps, ""]				
 
 		findOrCreatePattern: (name, context = @context) ->
 			pattern = _(context).find () ->
@@ -419,32 +478,6 @@ namespace "Games", (ex) ->
 
 			func
 
-		parseBrackets2: (exps) ->
-			func = @newFunc("disorder")
-			while ([next_exp, exps ] = @nextExp(exps)).length > 0 && next_exp != ""
-
-				if COMMAND_START_BRACKET.test(next_exp)
-					[nested, exps ] =  @parseBrackets(RegExp.rightContext + ',' + exps)
-					func.push nested
-					if COMMAND_END_BRACKET.test(next_exp)
-						return [func, exps]
-					else
-						continue
-
-				if COMMAND_PURE_END_BRACKET.test(next_exp)
-					return [func, exps]
-				else if COMMAND_END_BRACKET.test(next_exp)
-					exp = COMMAND_END_BRACKET.exec(next_exp)[1]
-					func.push(this.parseCommand(exp)) if exp != "" &&  exp?
-					return [func, exps]
-
-				else
-					exp = next_exp
-
-				func.push @parseCommand(exp)
-
-			[func, exps]
-
 		parseBrackets: (exps) ->
 			func = @newFunc("disorder")
 			while ([next_exp, exps ] = @nextExp(exps)).length > 0 && next_exp != ""
@@ -464,8 +497,12 @@ namespace "Games", (ex) ->
 
 			[func, exps]
 
-	class Tree
-		constructor: (@tree) ->
+	class ex.GameRules
+
+		constructor: (@executor, @rules) ->
+			@groups_parser = new ex.GroupParser(@executor)
+			@groups = @groups_parser.parse(@rules.groups)
+
 
 	class ex.Define
 		constructor: (@name, rules, args...) ->

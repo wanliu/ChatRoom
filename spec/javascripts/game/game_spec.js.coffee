@@ -362,3 +362,28 @@ describe "Game Rules Define", () ->
 			expect(results[0]).toBe(@methodPickEql)
 			expect(results[1]).toBe(1)
 
+
+	describe "Rules Executor", () ->
+
+		beforeEach () ->
+			rules = {
+				groups : {
+					"DOUBLE"      : "$A,$1"
+					"510K"		  : "[5, 10, K]"
+
+				}
+
+			}
+
+			@executor = new Games.Executor
+			@rules = new Games.GameRules(@executor, rules)
+
+			@runner = new Games.ExecutorRunner(@executor, @rules.groups)
+
+		it "DOUBLE 2, 2", ()->
+			result = @runner.execute(['2', '2'])
+			console.log result
+
+
+
+
