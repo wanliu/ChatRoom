@@ -32,6 +32,7 @@ end
 
 gem 'devise'
 gem 'devise-i18n'
+gem 'uuidtools'
 
 gem 'hirb'
 

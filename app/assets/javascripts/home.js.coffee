@@ -75,10 +75,10 @@ namespace "ChatRoom", (exports) ->
 		render: () ->
 			email = @model.get('email')
 			id = @model.get('id')
-			nickname = @model.get('nickname')
+			name = @model.get('name')
 			gravatar = @model.get('gravatar') + "?s=20"
 			email_path = "#profile/#{email}"
-			display = "#{image_tag(gravatar, 'gravatar')} #{@link_to(email, email_path)} #{@link_to(nickname, "#", {'class': 'msg', 'id': nickname, 'style': 'color:red'}) }"
+			display = "#{image_tag(gravatar, 'gravatar')} #{@link_to(email, email_path)} #{@link_to(name, "#", {'class': 'msg', 'id': name, 'style': 'color:red'}) }"
 			$(@el).html(display)
 			@
 

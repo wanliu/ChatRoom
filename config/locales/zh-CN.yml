@@ -206,6 +206,7 @@ zh-CN:
     attributes:
       user:
         nickname: "昵称"
+        name: "用户名"
         email: "邮件"
         password: "密码"
         remember_me: "记住我"
