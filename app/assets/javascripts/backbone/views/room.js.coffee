@@ -11,10 +11,20 @@ namespace 'ChatRoom' ,(exports) ->
 			'click .cancel_room' :	'cancel_room'
 		}
 
-		render: () ->
-			$(@el).html(@template)
-			@leftnav = @$('.left-nav')
+		initialize: (options) ->
+			_.extend(@,options)
+			this.$el = $(this.el)
 			@rooms = new exports.Rooms
+			@rooms.on("reset", @renderAllRoom, @)
+			@rooms.on("add", @renderOneRoom, @)
+			@rooms.fetch()
+			$(@el).html(@template)
+			@$leftnav = @$('.left-nav')
+
+		render: () ->
+
+			
+		refresh: () ->
 			@rooms.fetch()
 
 
@@ -26,11 +36,12 @@ namespace 'ChatRoom' ,(exports) ->
 			
 
 		create_room: ()	->
-			@room_name = @$('#room_name').val()
-			if @room_name.length != 0
-					@$('.dialog').hide()
-					@room = new exports.Room
-					@room.save({name:@room_name})
+			room_name = @$('#room_name').val()
+			if room_name.length != 0
+				@$('.dialog').hide()
+				room = new exports.Room
+				room.save({name: room_name})
+				@rooms.add(room)
 			else
 				alert("give it a name ,please")		
 
@@ -38,6 +49,27 @@ namespace 'ChatRoom' ,(exports) ->
 		cancel_room: () ->
 			@$('.dialog').hide()
 
-	class exports.Leftnav extends Backbone.View
-		TagName: 'li'
-		ClassName: 'rooms_names'
+		renderAllRoom: () ->
+			@$leftnav.html(' ')
+			@rooms.each $.proxy(@renderOneRoom, @)
+
+		renderOneRoom: (model) ->
+			view = new exports.LeftnavView(model: model)
+			@$leftnav.append(view.render().el)
+
+				
+
+	class exports.LeftnavView extends Backbone.View
+
+		tagName: 'li'
+		className: 'rooms_names'
+
+
+		render: () ->
+			$(@el).html(@model.get("name"))
+			@
+
+# 
+
+
+
