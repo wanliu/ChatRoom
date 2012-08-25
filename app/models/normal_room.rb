@@ -1,0 +1,3 @@
+class NormalRoom < Room
+	
+end
