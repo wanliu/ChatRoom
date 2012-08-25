@@ -68,14 +68,17 @@ namespace "ChatRoom", (exports) ->
 		className: 'user'
 
 		events: {
-			"click": "doFly"
+			#"click": "doFly"
+			"click .msg": "msgTo"
 		}
 
 		render: () ->
 			email = @model.get('email')
+			id = @model.get('id')
+			name = @model.get('name')
 			gravatar = @model.get('gravatar') + "?s=20"
 			email_path = "#profile/#{email}"
-			display = "#{image_tag(gravatar, 'gravatar')} #{@link_to(email, email_path)}"
+			display = "#{image_tag(gravatar, 'gravatar')} #{@link_to(email, email_path)} #{@link_to(name, "#", {'class': 'msg', 'id': name, 'style': 'color:red'}) }"
 			$(@el).html(display)
 			@
 
@@ -84,6 +87,10 @@ namespace "ChatRoom", (exports) ->
 
 		position_to_coord: (position) ->
 			@coord(position.left, position.top)
+
+		msgTo: () ->
+			Backbone.history.navigate("msg_to/#{@model.get('email')}", {trigger: true, replace: true})
+			false
 
 		readyFly: () ->
 
@@ -152,8 +159,12 @@ namespace "ChatRoom", (exports) ->
 		flyDone: () ->
 			window.Home.getContainer.append(@profile_view)
 
-		link_to: (display, url) ->
-			$("<a href=# >#{display}</a>").wrap('<p>').parent().html()
+		link_to: (display, url = "#", options = {}) ->
+			attributes = (for attr, value of options
+				attr + "=" + value
+				).join(" ")
+			console.log attributes
+			$("<a href=#{url} #{attributes}>#{display}</a>").wrap('<p>').parent().html()
 
 
 	class exports.RightSideView extends Backbone.View
@@ -180,35 +191,35 @@ namespace "ChatRoom", (exports) ->
 		addAll: () ->
 			@users().each(@addOne)
 
-	class exports.LeftNavView extends Backbone.View
-		el: ".left-nav"
-		template: ChatRoom.template('home/room')
+	# class exports.LeftNavView extends Backbone.View
+	# 	el: ".left-nav"
+	# 	template: ChatRoom.template('home/room')
 
-		initialize: (options) ->
-			@rooms().on("reset", @addAll, @)
-			@rooms().on("add", @addOne, @)
-			@rooms().fetch();
+	# 	initialize: (options) ->
+	# 		@rooms().on("reset", @addAll, @)
+	# 		@rooms().on("add", @addOne, @)
+	# 		@rooms().fetch();
 
-		rooms: () ->
+	# 	rooms: () ->
 
-		render: () ->
+	# 	render: () ->
 
-		addOne: () ->
+	# 	addOne: () ->
 
-		addAll: () ->	
+	# 	addAll: () ->	
 
-	class exports.RoomsView extends Backbone.View
-		tagName:"li"
-		className:"room"
+	# class exports.RoomsView extends Backbone.View
+	# 	tagName:"li"
+	# 	className:"room"
 
-		events: {
-			'dbclick'		:		'join_room'
-			'click'			:		'room_info'
-		}
+	# 	events: {
+	# 		'dbclick'		:		'join_room'
+	# 		'click'			:		'room_info'
+	# 	}
 		
-		join_room: () ->
+	# 	join_room: () ->
 
-		room_info: () ->
+	# 	room_info: () ->
 
 	
 	class exports.ChatView extends Backbone.View
@@ -240,6 +251,7 @@ namespace "ChatRoom", (exports) ->
 	class exports.HomeRouter extends Backbone.Router
 		routes: {
 			"profile/:user_name" :      "profile"
+			"msg_to/:user_name"	 : 		"msg_to"
 			"home"				 : 		"home"
 			"help"   			 :	  	"help"
 			"hall"				 :		"hall"
@@ -258,6 +270,12 @@ namespace "ChatRoom", (exports) ->
 			@containerView.registerView (context)	=>
 				@navigation_view ||= new exports.NavigationView(el: context.el)
 				
+
+			@containerView.registerView "msg_to", (context, user_name) =>
+				@msg_view ||= new exports.MsgChatView(el: context.el)
+
+
+
 			@containerView.registerEffect (effect)->
 				effects = {
 					container_el: ">.container-view"
@@ -390,6 +408,11 @@ namespace "ChatRoom", (exports) ->
 				# context.view = 
 				context.view.fetch(user_name)
 				context.switch()
+
+		msg_to: (user_name) ->
+			@containerView.switchView "msg_to" , user_name, (context) =>
+				context.switch()
+				context.view.with_user(user_name)
 
 		help: () ->
 			alert("help")

@@ -159,7 +159,7 @@ namespace "Viewport", (ex) ->
 			handle.call(@, context)
 
 		fetchContext = (name_or_view) ->
-			if name_or_view == "string"
+			if typeof name_or_view == "string"
 				context = __child_views[name_or_view] || throw new Error("invalid pattern name")
 			else
 				context = _(__child_views).find (child) ->

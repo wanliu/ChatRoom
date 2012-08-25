@@ -17,13 +17,17 @@ class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :token_authenticatable, :confirmable,
   # :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable, :validatable
+
+  devise :database_authenticatable, :registerable, :recoverable, :rememberable, :trackable, :validatable, :confirmable, :omniauthable
+  has_many :authorizations, :dependent => :destroy         
 
   # Setup accessible (or protected) attributes for your model
-  attr_accessible :nickname, :email, :password, :password_confirmation, :remember_me
+  attr_accessible :name, :email, :password, :password_confirmation, :remember_me,
+                  :uid, :provider
   # attr_accessible :title, :body
 
+  validates :name, :email, :presence => true
+  validates :name, :email, :uniqueness => true
   attr_reader :gravatar
 
   has_one :room_member
@@ -42,7 +46,9 @@ class User < ActiveRecord::Base
   end
 
   def leave
-    room_member.detete
+    return false if room_member.blank?
+
+    room_member.delete
     save
     reload
   end
@@ -54,5 +60,16 @@ class User < ActiveRecord::Base
   def as_json(*args)
     hash = super
     hash.merge! :gravatar => gravatar
+  end
+
+  # created by Jzl
+  def self.create_with_omniauth(auth)
+    #binding.pry
+    create! do |user|
+      user.provider = auth["provider"]
+      user.uid = auth["uid"]
+      user.email = auth["info"]["email"] + " from "+ user.provider
+      user.password = Devise.friendly_token[0,20]
+    end
   end
 end

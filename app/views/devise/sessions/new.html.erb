@@ -1,5 +1,7 @@
 <div class="well">
 <h2><%= t :sign_in -%></h2>
+  <%= link_to "Github用户登录", "/accounts/auth/github" %>
+  <%= link_to "Google用户登录", "/accounts/auth/google_oauth2" %>
 
 <%= form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f| %>
   <%= f.label :email %>

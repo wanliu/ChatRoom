@@ -17,7 +17,8 @@ ChatRoom::Application.routes.draw do
 
   resource :profiles
 
-  devise_for :users
+  devise_for :users, :path => "accounts", :controllers => { :omniauth_callbacks => "users/omniauth_callbacks", :registrations => "registrations" }
+
 
   match "/stream", :to => MessageServer
   root :to => 'home#index'
@@ -28,6 +29,10 @@ ChatRoom::Application.routes.draw do
   resources :users 
 
   mount JasmineRails::Engine => "/specs" unless Rails.env.production?
+
+  #the following created by Jzl
+  # match "/auth/:provider/callback" => 'sessions#create'
+  # match "/signout" => "sessions#destroy", :as => :signout
 
   # See how all your routes lay out with "rake routes"
 
