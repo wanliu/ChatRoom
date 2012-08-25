@@ -60,7 +60,6 @@ private
       elsif uid && name
         user = find_for_oauth_by_uid(uid, resource)
         if user.nil?
-          debugger
           user = find_for_oauth_by_name(name, resource)
         end
       end
