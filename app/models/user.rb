@@ -30,8 +30,8 @@ class User < ActiveRecord::Base
   validates :name, :email, :uniqueness => true
   attr_reader :gravatar
 
-  has_one :room_member
-  has_one :room, :through => :room_member
+  has_many :room_members
+  has_many :rooms, :through => :room_members
 
   attr_accessor :default_room
   @default_room = nil

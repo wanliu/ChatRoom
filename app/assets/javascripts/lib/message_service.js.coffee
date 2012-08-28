@@ -90,10 +90,11 @@ namespace "MessageService", (ex) ->
 		config = {
 			url             : "/stream",
 			adapter         : new @EventSourceAdapter("/stream"), 
-			message_handler : new @MessageHandler
+			message_handler : new @MessageHandler,
+			onmessage		: null
 		}
-		handle.call(@, config)
-
+		handle.call(@, config) if handle?
+		
 		standalone_service ||= new ex.StandaloneService(config)
 
 	ex.registerMessage = (name, callback) ->
@@ -106,6 +107,12 @@ namespace "MessageService", (ex) ->
 
 		standalone_service.unregisterMessage(name)
 
+	ex.sendObject = (object_hash) ->
+		return false unless standalone_service?
+
+		standalone_service.sendObject(object_hash)
+
+
 
 	class ex.StandaloneService
 		constructor: (@options = {}) ->
@@ -114,11 +121,16 @@ namespace "MessageService", (ex) ->
 				url    : @url, 
 				caller : @options.message_handler)
 
+			@adapter.onmessage(@options.onmessage) if @options.onmessage?
+
 		registerMessage: (name, callback) ->
 			@adapter.subscribie(name, callback)
 
 		unregisterMessage: (name) ->
 			@adapter.unsubscribe(name)
+
+		sendObject: (hash, options) ->
+			@adapter.sendObject(hash, options)
 
 
 	class ex.AbstractAdapter
@@ -129,15 +141,19 @@ namespace "MessageService", (ex) ->
 
 		subscribies: (args..., callback) ->
 
+		sendObject: (hash, options) ->
+
 		unsubscribe: (name) ->
+
+		onmessage: (callback) ->
 
 
 	class ex.EventSourceAdapter extends ex.AbstractAdapter
 
 		constructor: (@options) ->
 			@caller = @options.caller || new ex.MessageHandler
-			@options.url ||= "/stream"
-			@bound_adapter = @options.bound_adapter || new EventSource(@options.url)
+			@url    = @options.url || "/stream"
+			@bound_adapter = @options.bound_adapter || new EventSource(@url)
 			@registed_message_queues = {}
 
 		subscribie: (name, callback) ->
@@ -150,6 +166,15 @@ namespace "MessageService", (ex) ->
 		subscribies: (args..., callback) ->
 			for event_name in args
 				@subscribie(event_name, callback)
+
+		sendObject: (hash, options) ->
+			$.post(@url, hash, options)
+
+		onmessage: (callback) ->
+			@bound_adapter.onmessage = callback
+
+
+
 
 	class ex.MessageHandler
 
