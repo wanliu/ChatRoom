@@ -26,11 +26,18 @@ namespace "ChatRoom", (exports) ->
 			@home = new exports.HomeView
 			@home.render()			
 
+			@main = new exports.MultiRoomsView
+			@main.render()
+
+			@room = new exports.RoomsView(el: $("<div>"))
+			@main.addPane("rooms", @room)
+			@main.activeLast()
+
 			@right_side = new exports.RightSideView
 			@right_side.render()
 
-			@chat = new exports.ChatView
-			@chat.resize()
+			# @chat = new exports.ChatView
+			# @chat.resize()
 
 			@home.attachContainer()
 
@@ -247,6 +254,34 @@ namespace "ChatRoom", (exports) ->
 
 			$(@el).height(max_height - bottom_height - padding_hegiht - p1.top - 10)
 
+	class exports.MultiRoomsView extends Backbone.View
+
+		el: ".multi-tabs"
+
+		template: ChatRoom.template("home/main")
+
+		render: () ->
+			$(@el).html(@template())
+
+			@container = @$(".tab-content")
+			@tabs = @$(".nav.nav-tabs")
+
+		addPane: (name, view, options = {}) ->
+			display = options.display || name
+			tab  = $("<li><a data-toggle=\"tab\" href=\"##{name}\">#{display}</a></li>")
+			wrapper = $("<div class=\"tab-pane\" id=\"#{name}\" />").append(view.el)
+			@tabs.append(tab)
+			@container
+				.append(wrapper)
+
+		activeLast: () ->
+			@tabs.find("a:last").tab("show")
+
+
+		active: (name)->
+			@tabs.find("a[href=^##{name}]").tab("show")
+
+
 	class exports.HomeRouter extends Backbone.Router
 		routes: {
 			"profile/:user_name" :      "profile"
@@ -254,7 +289,7 @@ namespace "ChatRoom", (exports) ->
 			"home"				 : 		"home"
 			"help"   			 :	  	"help"
 			"hall"				 :		"hall"
-			"chat_room"		 	 :		"navigation"
+			"chat_room"		 	 :		"rooms"
 		}
 
 		constructor: ->
@@ -267,13 +302,11 @@ namespace "ChatRoom", (exports) ->
 				@profile_view ||= new exports.ProfileView(user_name: user_name, el: context.el )
 
 			@containerView.registerView (context)	=>
-				@navigation_view ||= new exports.NavigationView(el: context.el)
+				@rooms_view ||= new exports.RoomsView(el: context.el)
 				
 
 			@containerView.registerView "msg_to", (context, user_name) =>
 				@msg_view ||= new exports.MsgChatView(el: context.el)
-
-
 
 			@containerView.registerEffect (effect)->
 				effects = {
@@ -423,8 +456,8 @@ namespace "ChatRoom", (exports) ->
 		hall: () ->
 			@containerView.switchView(@hall_view)
 
-		navigation: () ->			
-			@containerView.switchView(@navigation_view)
+		rooms: () ->			
+			@containerView.switchView(@rooms_view)
 
 
 	MessageService.initialize

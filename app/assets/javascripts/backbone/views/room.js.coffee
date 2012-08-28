@@ -1,6 +1,6 @@
 namespace 'ChatRoom' ,(exports) ->
 
-	class exports.NavigationView extends Backbone.View
+	class exports.RoomsView extends Backbone.View
 
 		template: ChatRoom.template('home/room')
 		create_room_template: ChatRoom.template("home/create_room")
