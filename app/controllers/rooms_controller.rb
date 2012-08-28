@@ -5,6 +5,7 @@ class RoomsController < ApplicationController
 	def create
 		
 		@room = Room.new(:name => params[:name])
+		@room.members << current_user
 
 		if @room.save
 			respond_with(@room) 

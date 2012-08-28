@@ -64,6 +64,18 @@ module StreamServer
           "data: #{current_user.email}: #{msg}\n\n"
         end
 
+        def room_event_message(room, event, msg)
+          hash = {
+            "room_#{room.id}_#{event}" => room.id,
+            "data"                     => msg
+          }
+          event_message(hash)
+        end
+
+        def event_message(hash)
+          hash.to_json
+        end
+
     end
 
     class RequestSession

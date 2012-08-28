@@ -57,7 +57,7 @@ namespace 'ChatRoom' ,(exports) ->
 			@rooms.each $.proxy(@renderOneRoom, @)
 
 		renderOneRoom: (model) ->
-			view = new exports.LeftnavView(model: model)
+			view = new exports.RoomButtonView(model: model, parent_view: @parent_view)
 			@$leftnav.append(view.render().el)
 			# context = @containerView.first()
 			# @containerView.switchView(context.view)
@@ -68,15 +68,30 @@ namespace 'ChatRoom' ,(exports) ->
 			alert('ahahaahh')
 				
 
-	class exports.LeftnavView extends Backbone.View
+	class exports.RoomButtonView extends Backbone.View
 
 		tagName: 'li'
-		className: 'rooms_names'
+		className: 'room_button'
 
+		events:  {
+			"click": "switchView"
+		}
+
+		initialize: (options) ->
+			_.extend(@, options)
 
 		render: () ->
 			$(@el).html(@model.get("name"))
 			@
+
+
+		switchView: () ->
+			unless @chat_view?
+				@chat_view = new exports.ChatView(el: $("<div/>"), model: @model)
+				@chat_view.render()
+				@parent_view.addPane(@model.get("name"), @chat_view)
+
+			@parent_view.active(@model.get("name"))
 
 # 
 

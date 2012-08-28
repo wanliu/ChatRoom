@@ -29,7 +29,7 @@ namespace "ChatRoom", (exports) ->
 			@main = new exports.MultiRoomsView
 			@main.render()
 
-			@room = new exports.RoomsView(el: $("<div>"))
+			@room = new exports.RoomsView(el: $("<div>"), parent_view: @main)
 			@main.addPane("rooms", @room)
 			@main.activeLast()
 
@@ -197,63 +197,6 @@ namespace "ChatRoom", (exports) ->
 		addAll: () ->
 			@users().each(@addOne)
 
-	# class exports.LeftNavView extends Backbone.View
-	# 	el: ".left-nav"
-	# 	template: ChatRoom.template('home/room')
-
-	# 	initialize: (options) ->
-	# 		@rooms().on("reset", @addAll, @)
-	# 		@rooms().on("add", @addOne, @)
-	# 		@rooms().fetch();
-
-	# 	rooms: () ->
-
-	# 	render: () ->
-
-	# 	addOne: () ->
-
-	# 	addAll: () ->	
-
-	# class exports.RoomsView extends Backbone.View
-	# 	tagName:"li"
-	# 	className:"room"
-
-	# 	events: {
-	# 		'dbclick'		:		'join_room'
-	# 		'click'			:		'room_info'
-	# 	}
-		
-	# 	join_room: () ->
-
-	# 	room_info: () ->
-
-	
-	class exports.ChatView extends Backbone.View
-
-		el: "#chat"
-		msg_target: "#msg"
-		bottom_target: ".input-text"
-
-		initialize: () ->
-
-			$(window).resize($.proxy(@resize,@))
-
-
-		resize:(event) ->
-
-			max_height = $(window).height()
-
-			padding_hegiht = parseInt($(@el).css('padding-top')) +
-				parseInt($(@el).css('padding-bottom')) + 
-				parseInt($(@el).css('border-bottom-width'))	+ 
-				parseInt($(@el).css('border-top-width'))
-
-			bottom_height = $(@bottom_target).outerHeight(true) 
-
-			p1 = $(@el).offset()
-
-			$(@el).height(max_height - bottom_height - padding_hegiht - p1.top - 10)
-
 	class exports.MultiRoomsView extends Backbone.View
 
 		el: ".multi-tabs"
@@ -279,13 +222,12 @@ namespace "ChatRoom", (exports) ->
 
 
 		active: (name)->
-			@tabs.find("a[href=^##{name}]").tab("show")
+			@tabs.find("a[href=##{name}]").tab("show")
 
 
 	class exports.HomeRouter extends Backbone.Router
 		routes: {
 			"profile/:user_name" :      "profile"
-			"msg_to/:user_name"	 : 		"msg_to"
 			"home"				 : 		"home"
 			"help"   			 :	  	"help"
 			"hall"				 :		"hall"
@@ -304,9 +246,8 @@ namespace "ChatRoom", (exports) ->
 			@containerView.registerView (context)	=>
 				@rooms_view ||= new exports.RoomsView(el: context.el)
 				
-
-			@containerView.registerView "msg_to", (context, user_name) =>
-				@msg_view ||= new exports.MsgChatView(el: context.el)
+			# @containerView.registerView "msg_to", (context, user_name) =>
+			# 	@msg_view ||= new exports.MsgChatView(el: context.el)
 
 			@containerView.registerEffect (effect)->
 				effects = {
@@ -441,10 +382,10 @@ namespace "ChatRoom", (exports) ->
 				context.view.fetch(user_name)
 				context.switch()
 
-		msg_to: (user_name) ->
-			@containerView.switchView "msg_to" , user_name, (context) =>
-				context.switch()
-				context.view.with_user(user_name)
+		# msg_to: (user_name) ->
+		# 	@containerView.switchView "msg_to" , user_name, (context) =>
+		# 		context.switch()
+		# 		context.view.with_user(user_name)
 
 		help: () ->
 			alert("help")
@@ -460,7 +401,9 @@ namespace "ChatRoom", (exports) ->
 			@containerView.switchView(@rooms_view)
 
 
-	MessageService.initialize
+	MessageService.initialize (config) ->
+		config.onmessage = (event) ->
+			console.log event.data
 
 	window.Home = new exports.HomeApplication
 
