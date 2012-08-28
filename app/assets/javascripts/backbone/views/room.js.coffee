@@ -6,9 +6,11 @@ namespace 'ChatRoom' ,(exports) ->
 		create_room_template: ChatRoom.template("home/create_room")
 	
 		events: {
-			'click .new_room'	 :	'new_room'
-			'click .create_room' :	'create_room'
-			'click .cancel_room' :	'cancel_room'
+			'click .new_room'	 	:	'new_room'
+			'click .create_room' 	:	'create_room'
+			'click .cancel_room' 	:	'cancel_room'
+			'click .rooms_names' 	:	'rooms_detail'
+			'dblclick .rooms_names'  :	'enter_room'
 		}
 
 		initialize: (options) ->
@@ -20,7 +22,8 @@ namespace 'ChatRoom' ,(exports) ->
 			@rooms.fetch()
 			$(@el).html(@template)
 			@$leftnav = @$('.left-nav')
-
+			#@containerView = window.Home.getContainer()
+		
 		render: () ->
 
 			
@@ -38,7 +41,7 @@ namespace 'ChatRoom' ,(exports) ->
 		create_room: ()	->
 			room_name = @$('#room_name').val()
 			if room_name.length != 0
-				@$('.dialog').hide()
+				@$('.dialog').slideUp()
 				room = new exports.Room
 				room.save({name: room_name})
 				@rooms.add(room)
@@ -47,7 +50,7 @@ namespace 'ChatRoom' ,(exports) ->
 
 
 		cancel_room: () ->
-			@$('.dialog').hide()
+			@$('.dialog').slideUp()
 
 		renderAllRoom: () ->
 			@$leftnav.html(' ')
@@ -56,7 +59,13 @@ namespace 'ChatRoom' ,(exports) ->
 		renderOneRoom: (model) ->
 			view = new exports.LeftnavView(model: model)
 			@$leftnav.append(view.render().el)
+			# context = @containerView.first()
+			# @containerView.switchView(context.view)
+		
+		rooms_detail: () ->
 
+		enter_room: () ->
+			alert('ahahaahh')
 				
 
 	class exports.LeftnavView extends Backbone.View
