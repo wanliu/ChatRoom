@@ -1,12 +1,3 @@
-<script LANGUAGE="JavaScript"> 
-function openwin(x) 
-{
-var str=x;
-window.open('open.html',"newwindow","height=200, width=400, toolbar=no, menubar=no,scrollbars scrollbars=no, resizable=no, location=no, status=no") 
-return false;
-}
-</script> 
-
 <div class="row">
   <div class="span10 slider-viewport">
     <div class="dialog">
@@ -39,32 +30,4 @@ return false;
   </div>
   
 </div>
-
-<script>
-  // reading
-  var es = new EventSource('/stream');
-  es.onmessage = function(e) { 
-    $('#chat').append(e.data + "\n")
-    max = $('#chat')[0].scrollHeight - $('#chat').height();
-    $('#chat').scrollTop(max);
-  };
-
-  var postMessage = function(){
-    $.post('/stream', {msg: $('#msg').val()});
-    $('#msg').val(''); $('#msg').focus();
-  };
-  var isCtrl = false;
-  // writing
-  $("form").live("submit", function(e) {
-    postMessage();
-    e.preventDefault();
-  });
-
-  $("#msg").live("keydown", function(event){
-    if (event.keyCode === 10 || event.keyCode == 13 && event.ctrlKey)
-      $("form").submit();
-  })
-
-
-</script>
 

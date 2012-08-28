@@ -23,7 +23,6 @@ namespace "ChatRoom", (exports) ->
 	class exports.HomeApplication extends DelayedApplicatonBase
 
 		init: () ->
-
 			@home = new exports.HomeView
 			@home.render()
 
@@ -387,6 +386,8 @@ namespace "ChatRoom", (exports) ->
 		hall: () ->
 			@containerView.switchView(@hall_view)
 
+
+	MessageService.initialize
 
 	window.Home = new exports.HomeApplication
 
