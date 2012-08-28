@@ -24,7 +24,7 @@ namespace "ChatRoom", (exports) ->
 
 		init: () ->
 			@home = new exports.HomeView
-			@home.render()
+			@home.render()			
 
 			@right_side = new exports.RightSideView
 			@right_side.render()
@@ -190,6 +190,37 @@ namespace "ChatRoom", (exports) ->
 		addAll: () ->
 			@users().each(@addOne)
 
+	# class exports.LeftNavView extends Backbone.View
+	# 	el: ".left-nav"
+	# 	template: ChatRoom.template('home/room')
+
+	# 	initialize: (options) ->
+	# 		@rooms().on("reset", @addAll, @)
+	# 		@rooms().on("add", @addOne, @)
+	# 		@rooms().fetch();
+
+	# 	rooms: () ->
+
+	# 	render: () ->
+
+	# 	addOne: () ->
+
+	# 	addAll: () ->	
+
+	# class exports.RoomsView extends Backbone.View
+	# 	tagName:"li"
+	# 	className:"room"
+
+	# 	events: {
+	# 		'dbclick'		:		'join_room'
+	# 		'click'			:		'room_info'
+	# 	}
+		
+	# 	join_room: () ->
+
+	# 	room_info: () ->
+
+	
 	class exports.ChatView extends Backbone.View
 
 		el: "#chat"
@@ -223,6 +254,7 @@ namespace "ChatRoom", (exports) ->
 			"home"				 : 		"home"
 			"help"   			 :	  	"help"
 			"hall"				 :		"hall"
+			"chat_room"		 	 :		"navigation"
 		}
 
 		constructor: ->
@@ -234,8 +266,13 @@ namespace "ChatRoom", (exports) ->
 			@containerView.registerView "profile", (context, user_name) =>
 				@profile_view ||= new exports.ProfileView(user_name: user_name, el: context.el )
 
+			@containerView.registerView (context)	=>
+				@navigation_view ||= new exports.NavigationView(el: context.el)
+				
+
 			@containerView.registerView "msg_to", (context, user_name) =>
 				@msg_view ||= new exports.MsgChatView(el: context.el)
+
 
 
 			@containerView.registerEffect (effect)->
@@ -385,6 +422,9 @@ namespace "ChatRoom", (exports) ->
 
 		hall: () ->
 			@containerView.switchView(@hall_view)
+
+		navigation: () ->			
+			@containerView.switchView(@navigation_view)
 
 
 	MessageService.initialize

@@ -23,6 +23,7 @@ ChatRoom::Application.routes.draw do
   match "/stream", :to => MessageServer
   root :to => 'home#index'
 
+  resources :rooms
 
   match "/users/current_user", :to => "users#get_current_user"
   resources :users 

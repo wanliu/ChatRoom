@@ -1,0 +1,3 @@
+class TempRoom < Room
+
+end
