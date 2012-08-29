@@ -23,7 +23,7 @@ class User < ActiveRecord::Base
 
   # Setup accessible (or protected) attributes for your model
   attr_accessible :name, :email, :password, :password_confirmation, :remember_me,
-                  :uid, :provider, :confirmed_at
+                  :uid, :provider, :confirmed_at, :login
   # attr_accessible :title, :body
 
   validates :name, :email, :presence => true
@@ -33,7 +33,9 @@ class User < ActiveRecord::Base
   has_many :room_members
   has_many :rooms, :through => :room_members
 
-  attr_accessor :default_room
+  # Virtual attribute for authenticating by either name or email
+  # This is in addition to a real persisted field like 'name'
+  attr_accessor :default_room, :login
   @default_room = nil
 
   def join(room_name)
@@ -60,6 +62,13 @@ class User < ActiveRecord::Base
   def as_json(*args)
     hash = super
     hash.merge! :gravatar => gravatar
+  end
+
+  # Overrides the devise method find_for_authentication
+  # Allow users to Sign In using their username or email address
+  def self.find_for_authentication(conditions)
+    login = conditions.delete(:login)
+    where(conditions).where(["name = :value OR email = :value", { :value => login }]).first
   end
 
   # created by Jzl
