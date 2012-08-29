@@ -205,6 +205,7 @@ zh-CN:
       user: 用户
     attributes:
       user:
+        login: "用户名或邮箱"
         nickname: "昵称"
         name: "用户名"
         email: "邮件"
