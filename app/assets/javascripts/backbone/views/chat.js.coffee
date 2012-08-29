@@ -37,7 +37,7 @@ namespace "ChatRoom", (ex) ->
 			@$chat = @$("#chat")
 			@$msg  = @$("#msg")
 			$(window).resize($.proxy(@resize,@))
-			@resize()
+			setTimeout($.proxy(@resize, @) , 10)
 
 		resize:(event) ->
 
@@ -52,4 +52,4 @@ namespace "ChatRoom", (ex) ->
 
 			p1 = @$chat.offset()
 
-			@$chat.height(max_height - bottom_height - padding_hegiht - p1.top - 10)
+			@$chat.height(max_height - bottom_height - padding_hegiht - p1.top - 30)
