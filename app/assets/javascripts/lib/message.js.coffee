@@ -8,6 +8,8 @@ namespace "ChatRoom", (ex) ->
 			@room_id ||= room.get("id")
 			for _event, handle of @messages
 				name = "room_#{@room_id}_#{_event}"
+				# name = _event
+
 				MessageService.registerMessage(name, $.proxy(@[handle], @))
 
 		sendMessage: (msg) ->

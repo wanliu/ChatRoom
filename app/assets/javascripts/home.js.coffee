@@ -405,6 +405,13 @@ namespace "ChatRoom", (exports) ->
 		config.onmessage = (event) ->
 			console.log event.data
 
+		config.onopen = (event) ->
+			console.log 'connecting...'
+
+		config.onerror = (event) ->
+			console.log 'connect error'
+
+
 	window.Home = new exports.HomeApplication
 
 	ChatRoom.RouterManagement.register_router(ChatRoom.HomeRouter)
