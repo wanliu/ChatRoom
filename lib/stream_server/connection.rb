@@ -14,8 +14,8 @@ module StreamServer
       @request = request.dup
     end
 
-    def user_room
-      ActiveRecord::Base.silence { user.room }
+    def user_rooms
+      ActiveRecord::Base.silence { user.rooms }
       # user.room
     end
   end

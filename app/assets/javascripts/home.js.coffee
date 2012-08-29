@@ -23,15 +23,21 @@ namespace "ChatRoom", (exports) ->
 	class exports.HomeApplication extends DelayedApplicatonBase
 
 		init: () ->
-
 			@home = new exports.HomeView
-			@home.render()
+			@home.render()			
+
+			@main = new exports.MultiRoomsView
+			@main.render()
+
+			@room = new exports.RoomsView(el: $("<div>"), parent_view: @main)
+			@main.addPane("rooms", @room)
+			@main.activeLast()
 
 			@right_side = new exports.RightSideView
 			@right_side.render()
 
-			@chat = new exports.ChatView
-			@chat.resize()
+			# @chat = new exports.ChatView
+			# @chat.resize()
 
 			@home.attachContainer()
 
@@ -191,39 +197,41 @@ namespace "ChatRoom", (exports) ->
 		addAll: () ->
 			@users().each(@addOne)
 
-	class exports.ChatView extends Backbone.View
+	class exports.MultiRoomsView extends Backbone.View
 
-		el: "#chat"
-		msg_target: "#msg"
-		bottom_target: ".input-text"
+		el: ".multi-tabs"
 
-		initialize: () ->
+		template: ChatRoom.template("home/main")
 
-			$(window).resize($.proxy(@resize,@))
+		render: () ->
+			$(@el).html(@template())
+
+			@container = @$(".tab-content")
+			@tabs = @$(".nav.nav-tabs")
+
+		addPane: (name, view, options = {}) ->
+			display = options.display || name
+			tab  = $("<li><a data-toggle=\"tab\" href=\"##{name}\">#{display}</a></li>")
+			wrapper = $("<div class=\"tab-pane\" id=\"#{name}\" />").append(view.el)
+			@tabs.append(tab)
+			@container
+				.append(wrapper)
+
+		activeLast: () ->
+			@tabs.find("a:last").tab("show")
 
 
-		resize:(event) ->
+		active: (name)->
+			@tabs.find("a[href=##{name}]").tab("show")
 
-			max_height = $(window).height()
-
-			padding_hegiht = parseInt($(@el).css('padding-top')) +
-				parseInt($(@el).css('padding-bottom')) + 
-				parseInt($(@el).css('border-bottom-width'))	+ 
-				parseInt($(@el).css('border-top-width'))
-
-			bottom_height = $(@bottom_target).outerHeight(true) 
-
-			p1 = $(@el).offset()
-
-			$(@el).height(max_height - bottom_height - padding_hegiht - p1.top - 10)
 
 	class exports.HomeRouter extends Backbone.Router
 		routes: {
 			"profile/:user_name" :      "profile"
-			"msg_to/:user_name"	 : 		"msg_to"
 			"home"				 : 		"home"
 			"help"   			 :	  	"help"
 			"hall"				 :		"hall"
+			"chat_room"		 	 :		"rooms"
 		}
 
 		constructor: ->
@@ -235,9 +243,11 @@ namespace "ChatRoom", (exports) ->
 			@containerView.registerView "profile", (context, user_name) =>
 				@profile_view ||= new exports.ProfileView(user_name: user_name, el: context.el )
 
-			@containerView.registerView "msg_to", (context, user_name) =>
-				@msg_view ||= new exports.MsgChatView(el: context.el)
-
+			@containerView.registerView (context)	=>
+				@rooms_view ||= new exports.RoomsView(el: context.el)
+				
+			# @containerView.registerView "msg_to", (context, user_name) =>
+			# 	@msg_view ||= new exports.MsgChatView(el: context.el)
 
 			@containerView.registerEffect (effect)->
 				effects = {
@@ -372,10 +382,10 @@ namespace "ChatRoom", (exports) ->
 				context.view.fetch(user_name)
 				context.switch()
 
-		msg_to: (user_name) ->
-			@containerView.switchView "msg_to" , user_name, (context) =>
-				context.switch()
-				context.view.with_user(user_name)
+		# msg_to: (user_name) ->
+		# 	@containerView.switchView "msg_to" , user_name, (context) =>
+		# 		context.switch()
+		# 		context.view.with_user(user_name)
 
 		help: () ->
 			alert("help")
@@ -386,6 +396,20 @@ namespace "ChatRoom", (exports) ->
 
 		hall: () ->
 			@containerView.switchView(@hall_view)
+
+		rooms: () ->			
+			@containerView.switchView(@rooms_view)
+
+
+	MessageService.initialize (config) ->
+		config.onmessage = (event) ->
+			console.log event.data
+
+		config.onopen = (event) ->
+			console.log 'connecting...'
+
+		config.onerror = (event) ->
+			console.log 'connect error'
 
 
 	window.Home = new exports.HomeApplication

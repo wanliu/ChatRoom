@@ -61,8 +61,20 @@ module StreamServer
 
 
         def message(msg)
-          "data: #{current_user.email}: #{msg}\n\n"
+          # "data: #{current_user.email}: #{msg}"
+          ms = Message.new
+          ms.data(msg)
         end
+
+        def room_event_message(room, event, msg)
+#          "event: room_#{room.id}_#{event}\n#{message(msg)}\n"
+#         
+          
+          ms = Message.new
+          ms
+            .event("room_#{room.id}_#{event}")
+            .data(:author => current_user.name, :msg => msg)
+       end
 
     end
 
