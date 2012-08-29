@@ -125,6 +125,8 @@ namespace "MessageService", (ex) ->
 			@adapter.onmessage(@options.onmessage) if @options.onmessage?
 			@adapter.onopen(@options.onopen) if @options.onopen?
 			@adapter.onerror(@options.onerror) if @options.onerror?
+			@adapter.onclose(@options.onclose) if @options.onclose?
+
 
 		registerMessage: (name, callback) ->
 			@adapter.subscribie(name, callback)

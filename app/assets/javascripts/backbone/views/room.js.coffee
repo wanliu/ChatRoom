@@ -54,6 +54,7 @@ namespace 'ChatRoom' ,(exports) ->
 			@rooms.each $.proxy(@renderOneRoom, @)
 
 		renderOneRoom: (model) ->
+			model = new exports.Room(model)
 			view = new exports.RoomButtonView(model: model, parent_view: @parent_view)
 			@$leftnav.append(view.render().el)		
 				
@@ -64,7 +65,7 @@ namespace 'ChatRoom' ,(exports) ->
 		className: 'room_button'
 
 		events:  {
-			"click": "switchView"
+			"click": "joinRoom"
 		}
 
 		initialize: (options) ->
@@ -73,6 +74,10 @@ namespace 'ChatRoom' ,(exports) ->
 		render: () ->
 			$(@el).html(@model.get("name"))
 			@
+
+		joinRoom: () ->
+			@model.enter () =>
+				@switchView()
 
 
 		switchView: () ->

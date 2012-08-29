@@ -411,6 +411,9 @@ namespace "ChatRoom", (exports) ->
 		config.onerror = (event) ->
 			console.log 'connect error'
 
+		config.onclose = (event) ->
+			console.log 'close connect'
+
 
 	window.Home = new exports.HomeApplication
 

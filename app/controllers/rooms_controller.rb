@@ -49,4 +49,10 @@ class RoomsController < ApplicationController
 			format.json { head :no_content }
 		end
 	end
+
+	def enter
+		@room = Room.find(params[:id])
+		@room.members << current_user unless @room.members.exists?(current_user.id)
+		respond_with(@room)
+	end
 end

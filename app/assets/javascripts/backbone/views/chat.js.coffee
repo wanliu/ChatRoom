@@ -9,6 +9,7 @@ namespace "ChatRoom", (ex) ->
 
 		events: {
 			"submit .input-text": "sendChat"
+			"keydown #msg": "ctrlEnter"
 		}
 
 		messages: {
@@ -19,10 +20,19 @@ namespace "ChatRoom", (ex) ->
 			_.extend(@, options)
 			@registerListener(@model)
 
+		render: () ->
+			$(@el).html(@template())
+			@$chat = @$("#chat")
+			@$msg  = @$("#msg")
+			$(window).resize($.proxy(@resize,@))
+			setTimeout($.proxy(@resize, @) , 10)
+
 		chat: (event) ->
 		
 			result = JSON.parse(event.data)
 			@$chat.append("<p><span class=\"author\">#{result.author}:</span><span>#{result.msg}</span><p>")
+			max = @$chat[0].scrollHeight - @$chat.height()
+			@$chat.scrollTop(max)
 
 		sendChat: () ->
 
@@ -31,13 +41,9 @@ namespace "ChatRoom", (ex) ->
 			@$msg.val("")
 			false
 
-
-		render: () ->
-			$(@el).html(@template())
-			@$chat = @$("#chat")
-			@$msg  = @$("#msg")
-			$(window).resize($.proxy(@resize,@))
-			setTimeout($.proxy(@resize, @) , 10)
+		ctrlEnter: (event) ->
+			if (event.keyCode == 10 || event.keyCode == 13 && event.ctrlKey)
+		    	@sendChat()
 
 		resize:(event) ->
 
