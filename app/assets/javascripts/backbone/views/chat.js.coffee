@@ -11,16 +11,18 @@ namespace "ChatRoom", (ex) ->
 			"submit .input-text": "sendChat"
 		}
 
-		message: {
-			"onmessage": "onmessage"
+		messages: {
+			"chat": "chat"
 		}
 
 		initialize: (options) ->
 			_.extend(@, options)
 			@registerListener(@model)
 
-		onmessage: (event) ->
-			console.log event.data
+		chat: (event) ->
+		
+			result = JSON.parse(event.data)
+			@$chat.append("<p><span class=\"author\">#{result.author}:</span><span>#{result.msg}</span><p>")
 
 		sendChat: () ->
 

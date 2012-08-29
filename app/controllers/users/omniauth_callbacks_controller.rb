@@ -5,6 +5,10 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     oauthorize "Github"
   end
 
+  def google_oauth2
+    oauthorize "Google"
+  end
+
   def facebook
     oauthorize "Facebook"
   end
@@ -51,6 +55,10 @@ private
       uid = access_token['uid']
       name = access_token['info']['nickname']
       auth_attr = { :uid => uid, :token => access_token['credentials']['token'], :secret => access_token['credentials']['secret'], :name => name, :link => "https://github.com/#{name}" }
+    when "Google"
+      uid = access_token['uid']
+      name = access_token['info']['name']
+      auth_attr = { :uid => uid, :token => access_token['credentials']['token'], :secret => access_token['credentials']['secret'], :name => name, :link => "https://google.com/#{name}" }
     else
       raise 'Provider #{provider} not handled'
     end
@@ -100,13 +108,14 @@ private
       user
     else
       user = User.new(
-        :name => name, 
+        :name => name,
         :password => Devise.friendly_token[0,20], 
         :email => "#{UUIDTools::UUID.random_create}@host.com",
         :confirmed_at => Time.now
         )
       user.save :validate => false
     end
-    return user
+    #debugger
+    #return user
   end	
 end

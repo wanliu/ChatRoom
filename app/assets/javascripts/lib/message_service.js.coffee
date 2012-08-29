@@ -90,8 +90,7 @@ namespace "MessageService", (ex) ->
 		config = {
 			url             : "/stream",
 			adapter         : new @EventSourceAdapter("/stream"), 
-			message_handler : new @MessageHandler,
-			onmessage		: null
+			message_handler : new @MessageHandler
 		}
 		handle.call(@, config) if handle?
 		
@@ -112,6 +111,8 @@ namespace "MessageService", (ex) ->
 
 		standalone_service.sendObject(object_hash)
 
+	ex.close = () ->
+		standalone_service.close()
 
 
 	class ex.StandaloneService
@@ -122,6 +123,8 @@ namespace "MessageService", (ex) ->
 				caller : @options.message_handler)
 
 			@adapter.onmessage(@options.onmessage) if @options.onmessage?
+			@adapter.onopen(@options.onopen) if @options.onopen?
+			@adapter.onerror(@options.onerror) if @options.onerror?
 
 		registerMessage: (name, callback) ->
 			@adapter.subscribie(name, callback)
@@ -131,6 +134,9 @@ namespace "MessageService", (ex) ->
 
 		sendObject: (hash, options) ->
 			@adapter.sendObject(hash, options)
+
+		close: () ->
+			@adapter.close()
 
 
 	class ex.AbstractAdapter
@@ -146,6 +152,12 @@ namespace "MessageService", (ex) ->
 		unsubscribe: (name) ->
 
 		onmessage: (callback) ->
+
+		onopen: (callback) ->
+
+		onerror: (callback) ->
+
+		close: () ->
 
 
 	class ex.EventSourceAdapter extends ex.AbstractAdapter
@@ -170,9 +182,16 @@ namespace "MessageService", (ex) ->
 		sendObject: (hash, options) ->
 			$.post(@url, hash, options)
 
+		onopen: (callback) ->
+			@bound_adapter.onopen = callback
+
+		onerror: (callback) ->
+			@bound_adapter.onerror = callback
+
 		onmessage: (callback) ->
 			@bound_adapter.onmessage = callback
 
+		close: () ->
 
 
 
@@ -197,7 +216,7 @@ namespace "MessageService", (ex) ->
 			(event) =>
 				@_before_callbacks.run()
 				@doHandle(callback, event)
-				@run_after_callbacks.run()
+				@_after_callbacks.run()
 
 		doHandle: (callback, event) ->
 
