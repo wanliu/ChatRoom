@@ -8,9 +8,7 @@ namespace 'ChatRoom' ,(exports) ->
 		events: {
 			'click .new_room'	 	:	'new_room'
 			'click .create_room' 	:	'create_room'
-			'click .cancel_room' 	:	'cancel_room'
-			'click .rooms_names' 	:	'rooms_detail'
-			'dblclick .rooms_names'  :	'enter_room'
+			'click .cancel_room' 	:	'cancel_room'			
 		}
 
 		initialize: (options) ->
@@ -21,8 +19,7 @@ namespace 'ChatRoom' ,(exports) ->
 			@rooms.on("add", @renderOneRoom, @)
 			@rooms.fetch()
 			$(@el).html(@template)
-			@$leftnav = @$('.left-nav')
-			#@containerView = window.Home.getContainer()
+			@$leftnav = @$('.left-nav')		
 		
 		render: () ->
 
@@ -58,14 +55,7 @@ namespace 'ChatRoom' ,(exports) ->
 
 		renderOneRoom: (model) ->
 			view = new exports.RoomButtonView(model: model, parent_view: @parent_view)
-			@$leftnav.append(view.render().el)
-			# context = @containerView.first()
-			# @containerView.switchView(context.view)
-		
-		rooms_detail: () ->
-
-		enter_room: () ->
-			alert('ahahaahh')
+			@$leftnav.append(view.render().el)		
 				
 
 	class exports.RoomButtonView extends Backbone.View

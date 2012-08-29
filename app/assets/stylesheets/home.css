@@ -26,7 +26,28 @@
 	overflow-y:auto;
 }
 
+.left-nav>.room_button{  
+  float: left;
+  margin: 2px;
+  width: 200px;
+  height: 16px;
+  padding: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  background: -webkit-linear-gradient(left top , silver,  #efddd0);
+  background: -moz-linear-gradient(left top , silver,  #efddd0)
+}
 
+.left-nav>.room_button:hover{ 
+  background: -webkit-linear-gradient(left top , #fff,  #efddd0);
+  background: -moz-linear-gradient(left top , #fff,  #efddd0);
+  cursor: pointer;
+}
+
+.nav.nav-tabs>li>a:hover{
+  background-color: lightgreen
+}
 /*.slider-viewport {
   position: relative;
   -webkit-perspective: 1000px; 
@@ -80,7 +101,7 @@
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px;
-  background-color: #ccc
+  background: #ccc
 }
 
 .people.vertical {
