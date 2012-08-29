@@ -13,7 +13,7 @@ module StreamServer
   
       def add_connection(stream, request)
         conn = Connection.fetch(stream, request)
-        global_connections.delete_if { |c| c.user == conn.user }
+        # global_connections.delete_if { |c| c.user == conn.user }
         global_connections << conn
       end
 

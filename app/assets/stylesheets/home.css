@@ -45,10 +45,10 @@
   cursor: pointer;
 }
 
-.nav.nav-tabs>li>a:hover{
+/*.nav.nav-tabs>li>a:hover{
   background-color: lightgreen
 }
-/*.slider-viewport {
+*//*.slider-viewport {
   position: relative;
   -webkit-perspective: 1000px; 
   overflow: visible; 
@@ -116,6 +116,5 @@
 
 
 .multi-tabs {
-  margin-top: -14px;  
-
+  margin: -14px;  
 }
