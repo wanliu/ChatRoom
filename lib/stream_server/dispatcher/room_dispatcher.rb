@@ -21,8 +21,9 @@ module StreamServer
       end
 
       def room_connections(room)
+        members = room.members.to_a
 
-        connections.flatten.select { |conn| conn.user_rooms.exists?(room) }
+        connections.flatten.select { |conn| members.include?(conn.user) }
       end      
     end
   end
