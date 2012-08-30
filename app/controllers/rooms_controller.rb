@@ -54,5 +54,17 @@ class RoomsController < ApplicationController
 		@room = Room.find(params[:id])
 		@room.members << current_user unless @room.members.exists?(current_user.id)
 		respond_with(@room)
-	end
+  end
+
+  def members
+    @room = Room.find(params[:id])
+    respond_with(@room.members)
+  end
+
+  def member
+    User.joins(:rooms).where("users.name = ? and rooms.id = ?", params[:name], params[:id])
+    respond_with(@user)
+
+  end
+
 end

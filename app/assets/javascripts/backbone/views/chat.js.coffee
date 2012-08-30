@@ -18,6 +18,9 @@ namespace "ChatRoom", (ex) ->
 
 		initialize: (options) ->
 			_.extend(@, options)
+			@members = new ex.RoomUsers(room : @model)
+			@members.fetch()
+
 			@registerListener("room_#{@model.id}")
 
 		render: () ->
@@ -30,9 +33,21 @@ namespace "ChatRoom", (ex) ->
 		chat: (event) ->
 		
 			result = JSON.parse(event.data)
-			@$chat.append("<p><span class=\"author\">#{result.author}:</span><span>#{result.msg}</span><p>")
+			author = @getMemberUser(result.author)
+			author_img = image_tag(author.gravatar(s: 20))
+			@$chat.append("<p>#{author_img}<span class=\"author\">#{result.author}:</span><span>#{result.msg}</span><p>")
 			max = @$chat[0].scrollHeight - @$chat.height()
 			@$chat.scrollTop(max)
+
+		getMemberUser: (name) ->
+			user = @members.find (user) ->
+				user.get("name") == name
+		
+			unless user?
+				@members.fetchUserName(name)
+				@members.first() || new ex.User
+			user
+
 
 		sendChat: () ->
 
