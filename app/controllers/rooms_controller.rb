@@ -8,8 +8,8 @@ class RoomsController < ApplicationController
 		@room.members << current_user
 
 		if @room.save
-			respond_with(@room) 
 			flash[:notice] = "Successfully created..."
+			respond_with @room
 		end
 	end
 

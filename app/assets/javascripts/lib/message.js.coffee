@@ -4,19 +4,12 @@ namespace "ChatRoom", (ex) ->
 	class ex.MessageView extends Backbone.View
 
 		# room : Room Model
-		registerListener: (room) ->
-			@room_id ||= room.get("id")
+		registerListener: (scope) ->
 			for _event, handle of @messages
-				name = "room_#{@room_id}_#{_event}"
+				name = "#{scope}_#{_event}"
 				# name = _event
 
 				MessageService.registerMessage(name, $.proxy(@[handle], @))
 
-		sendMessage: (msg) ->
-			msg_hash = {
-				'msg'     : msg
-				'room_id' : @room_id
-			}
-			
-			MessageService.sendObject(msg_hash)
-
+		sendObject: (hash) ->
+			MessageService.sendObject(hash)
