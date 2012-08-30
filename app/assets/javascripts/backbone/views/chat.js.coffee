@@ -19,7 +19,7 @@ namespace "ChatRoom", (ex) ->
 
 		initialize: (options) ->
 			_.extend(@, options)
-			@registerListener(@model)
+			@registerListener("room_#{@model.id}")
 
 		render: () ->
 			$(@el).html(@template())
@@ -38,7 +38,12 @@ namespace "ChatRoom", (ex) ->
 		sendChat: () ->
 
 			msg = @$msg.val()
-			@sendMessage(msg)
+			msg_hash = {
+				'msg'     : msg
+				'room_id' : @model.get("id")
+			}
+			@sendObject(msg_hash)
+
 			@$msg.val("")
 			false
 

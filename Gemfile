@@ -65,3 +65,4 @@ gem "thin"
 # To use debugger
 gem 'debugger'
 
+gem 'ruby-prof'

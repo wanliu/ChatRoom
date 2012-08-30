@@ -1,6 +1,6 @@
 namespace 'ChatRoom' ,(exports) ->
 
-	class exports.RoomsView extends Backbone.View
+	class exports.RoomsView extends ChatRoom.MessageView
 
 		template: ChatRoom.template('home/room')
 		create_room_template: ChatRoom.template("home/create_room")
@@ -11,6 +11,11 @@ namespace 'ChatRoom' ,(exports) ->
 			'click .cancel_room' 	:	'cancel_room'			
 		}
 
+		messages: {
+			'add_room': "add_room"
+			'remove_room' : 'remove_room'
+		}
+
 		initialize: (options) ->
 			_.extend(@,options)
 			this.$el = $(this.el)
@@ -19,13 +24,27 @@ namespace 'ChatRoom' ,(exports) ->
 			@rooms.on("add", @renderOneRoom, @)
 			@rooms.fetch()
 			$(@el).html(@template)
-			@$leftnav = @$('.left-nav')		
+			@$leftnav = @$('.left-nav')
+			@registerListener("rooms")
+
 		
 		render: () ->
 
 			
 		refresh: () ->
 			@rooms.fetch()
+
+		add_room: (event) ->
+			result = JSON.parse(event.data)
+			room = new exports.Room(id : result.room_id)
+			@rooms.add(room)
+			room.fetch()
+
+
+		remove_room: (event) ->
+			result = JSON.parse(event.data)
+			room = @rooms.get(result.room_id)
+			@rooms.remove(room)
 
 
 		new_room: () ->
@@ -40,7 +59,7 @@ namespace 'ChatRoom' ,(exports) ->
 			if room_name.length != 0
 				@$('.dialog').slideUp()
 				room = new exports.Room
-				room.save({name: room_name})
+				room.save({name: room_name}) 
 				@rooms.add(room)
 			else
 				alert("give it a name ,please")		
@@ -54,7 +73,7 @@ namespace 'ChatRoom' ,(exports) ->
 			@rooms.each $.proxy(@renderOneRoom, @)
 
 		renderOneRoom: (model) ->
-			model = new exports.Room(model)
+			model = new exports.Room(model) unless model.constructor == ChatRoom.Room
 			view = new exports.RoomButtonView(model: model, parent_view: @parent_view)
 			@$leftnav.append(view.render().el)		
 				
