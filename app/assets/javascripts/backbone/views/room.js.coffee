@@ -84,7 +84,7 @@ namespace 'ChatRoom' ,(exports) ->
 			unless @chat_view?
 				@chat_view = new exports.ChatView(el: $("<div/>"), model: @model)
 				@chat_view.render()
-				@parent_view.addPane(@model.get("name"), @chat_view)
+				@parent_view.addPane(@model.get("name"), @chat_view, @)
 
 			@parent_view.active(@model.get("name"))
 

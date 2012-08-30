@@ -26,6 +26,7 @@ ChatRoom::Application.routes.draw do
   resources :rooms do 
     member do
       put 'enter'
+      put 'exit'
     end
   end
 

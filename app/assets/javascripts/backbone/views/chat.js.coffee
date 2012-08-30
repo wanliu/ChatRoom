@@ -9,7 +9,8 @@ namespace "ChatRoom", (ex) ->
 
 		events: {
 			"submit .input-text": "sendChat"
-			"keydown #msg": "ctrlEnter"
+			"keydown #msg"		: "ctrlEnter"
+			"click .quitRoom"	: "quitRoom"
 		}
 
 		messages: {
@@ -43,7 +44,12 @@ namespace "ChatRoom", (ex) ->
 
 		ctrlEnter: (event) ->
 			if (event.keyCode == 10 || event.keyCode == 13 && event.ctrlKey)
-		    	@sendChat()
+				@sendChat()
+
+		quitRoom: () ->			
+			@model.exit () =>
+				if @multi_tabs? && _.isObject(@multi_tabs) && _.isFunction(@multi_tabs.removePane)
+					@multi_tabs.removePane(@)
 
 		resize:(event) ->
 
@@ -60,4 +66,4 @@ namespace "ChatRoom", (ex) ->
 			@$chat.animate({
 				height:　max_height - bottom_height - padding_hegiht - p1.top - 30
 				})
-			#　@$chat.height()
+

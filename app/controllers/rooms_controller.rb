@@ -50,6 +50,12 @@ class RoomsController < ApplicationController
 		end
 	end
 
+	def exit
+		@room = Room.find(params[:id])
+		@room.members.destroy(current_user)
+		respond_with(@room)
+	end
+
 	def enter
 		@room = Room.find(params[:id])
 		@room.members << current_user unless @room.members.exists?(current_user.id)

@@ -4,14 +4,20 @@ namespace 'ChatRoom', (exports) ->
 		urlRoot: 'rooms'
 
 		enter: (callback) ->
+			@requestRoom(callback, "/enter", "sorry!can't join the room")
+			
 
-			# POST /rooms/1/enter
+		exit: (callback) ->
+			@requestRoom(callback, "/exit", "sorry!failed to exit")
+			
+
+		requestRoom: (callback,target,error) ->
 			@save({}, { 
-				url : @url() + "/enter" , 
+				url : @url() + target , 
 				success: (args...) =>
-					callback.apply(@,args)
+					callback.apply(@)
 				error: (args...) =>
-					alert("join the room failed")
+					alert(error)
 			})
 		
 	class exports.Rooms extends	Backbone.Collection
