@@ -230,10 +230,14 @@ namespace "ChatRoom", (exports) ->
 				_hash.view == view
 
 			if hash?
-				hash.tab.remove()
-				hash.pane.remove()
+				hash.tab.slideUp () =>
+					hash.pane.remove()
+				hash.pane.slideUp () =>
+					hash.tab.remove()
+					@activeLast()
+				
 				delete hash.button.chat_view
-				@activeLast() 			
+					
 
 
 		activeLast: () ->
