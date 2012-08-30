@@ -71,4 +71,4 @@ namespace "ChatRoom", (exports) ->
 
 		fetchUserName: (name) ->
 			url = "/rooms/#{@room.id}/member/#{name}"
-			@fetch(url: url, wait: true)
+			@fetch(url: url, async: false)

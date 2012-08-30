@@ -68,7 +68,7 @@ class RoomsController < ApplicationController
   end
 
   def member
-    User.joins(:rooms).where("users.name = ? and rooms.id = ?", params[:name], params[:id])
+    @user = User.joins(:rooms).where("users.name = ? and rooms.id = ?", params[:name], params[:id]).first
     respond_with(@user)
 
   end

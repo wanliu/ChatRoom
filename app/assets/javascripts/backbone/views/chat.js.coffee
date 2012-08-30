@@ -35,20 +35,21 @@ namespace "ChatRoom", (ex) ->
 		
 			result = JSON.parse(event.data)
 			author = @getMemberUser(result.author)
-			author_img = image_tag(author.gravatar(s: 20))
-			@$chat.append("<p>#{author_img}<span class=\"author\">#{result.author}:</span><span>#{result.msg}</span><p>")
+			author_img = image_tag(author.gravatar(s: 13))
+			@$chat.append("<p>#{author_img}<span class=\"author\">&nbsp;#{result.author}:</span><span>#{result.msg}</span><p>")
 			max = @$chat[0].scrollHeight - @$chat.height()
 			@$chat.scrollTop(max)
 
 		getMemberUser: (name) ->
-			user = @members.find (user) ->
+			user = @members.find (user) -> 
 				user.get("name") == name
-		
-			unless user?
+			
+			user = if !user?
 				@members.fetchUserName(name)
 				@members.first() || new ex.User
-			user
-
+			else
+				user
+			
 
 		sendChat: () ->
 
