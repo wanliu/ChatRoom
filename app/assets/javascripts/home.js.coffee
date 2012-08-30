@@ -203,19 +203,42 @@ namespace "ChatRoom", (exports) ->
 
 		template: ChatRoom.template("home/main")
 
+		view_tabs: []
+
 		render: () ->
 			$(@el).html(@template())
 
 			@container = @$(".tab-content")
 			@tabs = @$(".nav.nav-tabs")
 
-		addPane: (name, view, options = {}) ->
+		addPane: (name, chat_view, button, options = {}) ->
 			display = options.display || name
 			tab  = $("<li><a data-toggle=\"tab\" href=\"##{name}\">#{display}</a></li>")
-			wrapper = $("<div class=\"tab-pane\" id=\"#{name}\" />").append(view.el)
-			@tabs.append(tab)
-			@container
-				.append(wrapper)
+			wrapper = $("<div class=\"tab-pane\" id=\"#{name}\" />").append(chat_view.el)
+			chat_view.multi_tabs = @
+			@view_tabs.push({
+					tab: tab.appendTo(@tabs)
+					pane: wrapper.appendTo(@container)
+					button: button
+					view: chat_view
+				})
+
+
+		removePane: (view) ->
+
+			hash = _(@view_tabs).find (_hash) ->
+				_hash.view == view
+
+			if hash?
+				hash.tab.slideUp () =>
+					hash.pane.remove()
+				hash.pane.slideUp () =>
+					hash.tab.remove()
+					@activeLast()
+				
+				delete hash.button.chat_view
+					
+
 
 		activeLast: () ->
 			@tabs.find("a:last").tab("show")
