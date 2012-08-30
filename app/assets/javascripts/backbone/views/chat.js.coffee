@@ -57,5 +57,7 @@ namespace "ChatRoom", (ex) ->
 			bottom_height = $(@bottom_target).outerHeight(true) 
 
 			p1 = @$chat.offset()
-
-			@$chat.height(max_height - bottom_height - padding_hegiht - p1.top - 30)
+			@$chat.animate({
+				height:　max_height - bottom_height - padding_hegiht - p1.top - 30
+				})
+			#　@$chat.height()

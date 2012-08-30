@@ -159,7 +159,10 @@ namespace "MessageService", (ex) ->
 
 		onerror: (callback) ->
 
+		onclose: (callback) ->
+
 		close: () ->
+
 
 
 	class ex.EventSourceAdapter extends ex.AbstractAdapter
@@ -193,7 +196,12 @@ namespace "MessageService", (ex) ->
 		onmessage: (callback) ->
 			@bound_adapter.onmessage = callback
 
+		onclose: (callback) ->
+			@bound_adapter.onclose = callback
+
 		close: () ->
+			@bound_adapter.close()
+
 
 
 
