@@ -38,10 +38,6 @@ ChatRoom::Application.routes.draw do
 
   mount JasmineRails::Engine => "/specs" unless Rails.env.production?
 
-  #the following created by Jzl
-  # match "/auth/:provider/callback" => 'sessions#create'
-  # match "/signout" => "sessions#destroy", :as => :signout
-
   # See how all your routes lay out with "rake routes"
 
   # This is a legacy wild controller route that's not recommended for RESTful applications.
