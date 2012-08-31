@@ -73,6 +73,8 @@ namespace "ChatRoom", (exports) ->
 		tagName: 'li'
 		className: 'user'
 
+		template: ChatRoom.template("home/online_users")
+
 		events: {
 			#"click": "doFly"
 			"click .msg": "msgTo"
@@ -84,8 +86,9 @@ namespace "ChatRoom", (exports) ->
 			name = @model.get('name')
 			gravatar = @model.get('gravatar') + "?s=20"
 			email_path = "#profile/#{email}"
-			display = "#{image_tag(gravatar, 'gravatar')} #{@link_to(email, email_path)} #{@link_to(name, "#", {'class': 'msg', 'id': name, 'style': 'color:red'}) }"
-			$(@el).html(display)
+			@model.set({"image_src": gravatar })
+			# display = "#{image_tag(gravatar, 'gravatar')} #{@link_to(name, '#', {id:name})}"
+			$(@el).html(@template(@model.toJSON()))
 			@
 
 		coord: (x, y) ->

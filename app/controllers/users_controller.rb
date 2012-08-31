@@ -17,7 +17,7 @@ class UsersController < ApplicationController
   respond_to :json, :html
 
   def index
-    @users = User.all
+    @users = User.find(:all, :conditions => "sign_in_status = 1", :order => :name)
     respond_with(@users)
   end
 

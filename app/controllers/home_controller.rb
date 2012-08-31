@@ -13,8 +13,10 @@
 
 class HomeController < ApplicationController
   before_filter :authenticate_user!
+  respond_to :json
 
   def index
   	session["hello"] = "world"
+  	# render :json => session["hello"]
   end
 end
