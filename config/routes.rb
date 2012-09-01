@@ -28,17 +28,17 @@ ChatRoom::Application.routes.draw do
   resources :rooms do 
     member do
       put 'enter'
+      get 'members'
+      put 'exit'
     end
   end
+
+  match "/rooms/:id/member/:name", :controller => "rooms", :action => "member"
 
   match "/users/current_user", :to => "users#get_current_user"
   resources :users 
 
   mount JasmineRails::Engine => "/specs" unless Rails.env.production?
-
-  #the following created by Jzl
-  # match "/auth/:provider/callback" => 'sessions#create'
-  # match "/signout" => "sessions#destroy", :as => :signout
 
   # See how all your routes lay out with "rake routes"
 

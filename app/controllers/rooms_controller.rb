@@ -50,9 +50,27 @@ class RoomsController < ApplicationController
 		end
 	end
 
+	def exit
+		@room = Room.find(params[:id])
+		@room.members.destroy(current_user)
+		respond_with(@room)
+	end
+
 	def enter
 		@room = Room.find(params[:id])
 		@room.members << current_user unless @room.members.exists?(current_user.id)
 		respond_with(@room)
-	end
+  end
+
+  def members
+    @room = Room.find(params[:id])
+    respond_with(@room.members)
+  end
+
+  def member
+    @user = User.joins(:rooms).where("users.name = ? and rooms.id = ?", params[:name], params[:id]).first
+    respond_with(@user)
+
+  end
+
 end

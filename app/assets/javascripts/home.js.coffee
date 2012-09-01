@@ -75,9 +75,12 @@ namespace "ChatRoom", (exports) ->
 		tagName: 'li'
 		className: 'user'
 
+		template: ChatRoom.template("home/online_users")
+
 		events: {
 			#"click": "doFly"
 			"click .msg": "msgTo"
+			"hover .user_name" : "userInfo"
 		}
 
 		render: () ->
@@ -86,8 +89,9 @@ namespace "ChatRoom", (exports) ->
 			name = @model.get('name')
 			gravatar = @model.get('gravatar') + "?s=20"
 			email_path = "#profile/#{email}"
-			display = "#{image_tag(gravatar, 'gravatar')} #{@link_to(email, email_path)} #{@link_to(name, "#", {'class': 'msg', 'id': name, 'style': 'color:red'}) }"
-			$(@el).html(display)
+			@model.set({"image_src": gravatar })
+			# display = "#{image_tag(gravatar, 'gravatar')} #{@link_to(name, '#', {id:name})}"
+			$(@el).html(@template(@model.toJSON()))
 			@
 
 		coord: (x, y) ->
@@ -95,6 +99,9 @@ namespace "ChatRoom", (exports) ->
 
 		position_to_coord: (position) ->
 			@coord(position.left, position.top)
+
+		userInfo: () ->
+			@$(".user_name").popover('toggle')
 
 		msgTo: () ->
 			Backbone.history.navigate("msg_to/#{@model.get('email')}", {trigger: true, replace: true})
@@ -205,19 +212,42 @@ namespace "ChatRoom", (exports) ->
 
 		template: ChatRoom.template("home/main")
 
+		view_tabs: []
+
 		render: () ->
 			$(@el).html(@template())
 
 			@container = @$(".tab-content")
 			@tabs = @$(".nav.nav-tabs")
 
-		addPane: (name, view, options = {}) ->
+		addPane: (name, chat_view, button, options = {}) ->
 			display = options.display || name
 			tab  = $("<li><a data-toggle=\"tab\" href=\"##{name}\">#{display}</a></li>")
-			wrapper = $("<div class=\"tab-pane\" id=\"#{name}\" />").append(view.el)
-			@tabs.append(tab)
-			@container
-				.append(wrapper)
+			wrapper = $("<div class=\"tab-pane\" id=\"#{name}\" />").append(chat_view.el)
+			chat_view.multi_tabs = @
+			@view_tabs.push({
+					tab: tab.appendTo(@tabs)
+					pane: wrapper.appendTo(@container)
+					button: button
+					view: chat_view
+				})
+
+
+		removePane: (view) ->
+
+			hash = _(@view_tabs).find (_hash) ->
+				_hash.view == view
+
+			if hash?
+				hash.tab.slideUp () =>
+					hash.pane.remove()
+				hash.pane.slideUp () =>
+					hash.tab.remove()
+					@activeLast()
+				
+				delete hash.button.chat_view
+					
+
 
 		activeLast: () ->
 			@tabs.find("a:last").tab("show")

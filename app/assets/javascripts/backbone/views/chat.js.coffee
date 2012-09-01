@@ -9,7 +9,8 @@ namespace "ChatRoom", (ex) ->
 
 		events: {
 			"submit .input-text": "sendChat"
-			"keydown #msg": "ctrlEnter"
+			"keydown #msg"		: "ctrlEnter"
+			"click .quitRoom"	: "quitRoom"
 		}
 
 		messages: {
@@ -19,6 +20,8 @@ namespace "ChatRoom", (ex) ->
 		initialize: (options) ->
 			_.extend(@, options)
 			@registerListener("rooms/#{@model.id}")
+			@members = new ex.RoomUsers(room : @model)
+			@members.fetch()
 
 		render: () ->
 			$(@el).html(@template())
@@ -29,9 +32,22 @@ namespace "ChatRoom", (ex) ->
 
 		chat: (result) ->
 		
-			@$chat.append("<p><span class=\"author\">#{result.author}:</span><span>#{result.msg}</span><p>")
+			author = @getMemberUser(result.author)
+			author_img = image_tag(author.gravatar(s: 13))
+			@$chat.append("<p>#{author_img}<span class=\"author\">&nbsp;#{result.author}:</span><span>#{result.msg}</span><p>")
 			max = @$chat[0].scrollHeight - @$chat.height()
 			@$chat.scrollTop(max)
+
+		getMemberUser: (name) ->
+			user = @members.find (user) -> 
+				user.get("name") == name
+			
+			user = if !user?
+				@members.fetchUserName(name)
+				@members.first() || new ex.User
+			else
+				user
+			
 
 		sendChat: () ->
 
@@ -54,7 +70,12 @@ namespace "ChatRoom", (ex) ->
 
 		ctrlEnter: (event) ->
 			if (event.keyCode == 10 || event.keyCode == 13 && event.ctrlKey)
-		    	@sendChat()
+				@sendChat()
+
+		quitRoom: () ->			
+			@model.exit () =>
+				if @multi_tabs? && _.isObject(@multi_tabs) && _.isFunction(@multi_tabs.removePane)
+					@multi_tabs.removePane(@)
 
 		resize:(event) ->
 
@@ -71,4 +92,4 @@ namespace "ChatRoom", (ex) ->
 			@$chat.animate({
 				height:　max_height - bottom_height - padding_hegiht - p1.top - 30
 				})
-			#　@$chat.height()
+
