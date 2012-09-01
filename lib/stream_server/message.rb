@@ -13,7 +13,8 @@ module StreamServer
     end
 
     def id(int)
-      @string_queue << "id: #{id}"
+      @string_queue << "id: #{int}"
+      self
     end
 
     def event(name)

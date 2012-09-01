@@ -19,8 +19,10 @@ ChatRoom::Application.routes.draw do
 
   devise_for :users, :path => "accounts", :controllers => { :omniauth_callbacks => "users/omniauth_callbacks", :registrations => "registrations" }
 
-
-  match "/stream", :to => MessageServer
+  # Message Service
+  faye_server '/faye', :timeout => 25
+#  match "/stream", :to => MessageServer
+#  match "/"
   root :to => 'home#index'
 
   resources :rooms do 

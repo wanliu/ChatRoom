@@ -18,7 +18,7 @@ namespace "ChatRoom", (ex) ->
 
 		initialize: (options) ->
 			_.extend(@, options)
-			@registerListener("room_#{@model.id}")
+			@registerListener("rooms/#{@model.id}")
 
 		render: () ->
 			$(@el).html(@template())
@@ -27,9 +27,8 @@ namespace "ChatRoom", (ex) ->
 			$(window).resize($.proxy(@resize,@))
 			setTimeout($.proxy(@resize, @) , 10)
 
-		chat: (event) ->
+		chat: (result) ->
 		
-			result = JSON.parse(event.data)
 			@$chat.append("<p><span class=\"author\">#{result.author}:</span><span>#{result.msg}</span><p>")
 			max = @$chat[0].scrollHeight - @$chat.height()
 			@$chat.scrollTop(max)
@@ -39,9 +38,16 @@ namespace "ChatRoom", (ex) ->
 			msg = @$msg.val()
 			msg_hash = {
 				'msg'     : msg
-				'room_id' : @model.get("id")
+				'author' : Home.current_user.get("name")
 			}
-			@sendObject(msg_hash)
+
+			publication = @sendObject(@eventPath("chat"), msg_hash)
+
+			publication.callback () ->
+				console.log 'Message received by server!'
+
+			publication.errback (error) ->
+				console.log 'There was a problem: ' + error.message
 
 			@$msg.val("")
 			false

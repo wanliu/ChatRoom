@@ -11,6 +11,8 @@ module StreamServer
     get '/stream', provides: 'text/event-stream' do
       stream :keep_open do |out|
         puts "Establish a connection..."
+        p request
+        
         conn = dispatcher.add_connection(out, request)
         ActiveRecord::Base.connection.close
         #settings.connections << conn
