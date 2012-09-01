@@ -14,6 +14,8 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 
+#= require "faye-browser"
+
 namespace "ChatRoom", (exports) ->
 
 	class DelayedApplicatonBase
@@ -73,9 +75,12 @@ namespace "ChatRoom", (exports) ->
 		tagName: 'li'
 		className: 'user'
 
+		template: ChatRoom.template("home/online_users")
+
 		events: {
 			#"click": "doFly"
 			"click .msg": "msgTo"
+			"hover .user_name" : "userInfo"
 		}
 
 		render: () ->
@@ -84,8 +89,9 @@ namespace "ChatRoom", (exports) ->
 			name = @model.get('name')
 			gravatar = @model.get('gravatar') + "?s=20"
 			email_path = "#profile/#{email}"
-			display = "#{image_tag(gravatar, 'gravatar')} #{@link_to(email, email_path)} #{@link_to(name, "#", {'class': 'msg', 'id': name, 'style': 'color:red'}) }"
-			$(@el).html(display)
+			@model.set({"image_src": gravatar })
+			# display = "#{image_tag(gravatar, 'gravatar')} #{@link_to(name, '#', {id:name})}"
+			$(@el).html(@template(@model.toJSON()))
 			@
 
 		coord: (x, y) ->
@@ -93,6 +99,9 @@ namespace "ChatRoom", (exports) ->
 
 		position_to_coord: (position) ->
 			@coord(position.left, position.top)
+
+		userInfo: () ->
+			@$(".user_name").popover('toggle')
 
 		msgTo: () ->
 			Backbone.history.navigate("msg_to/#{@model.get('email')}", {trigger: true, replace: true})
@@ -425,6 +434,10 @@ namespace "ChatRoom", (exports) ->
 
 
 	MessageService.initialize (config) ->
+
+		config.url = "/faye"
+		config.adapter = "Faye" 
+
 		config.onmessage = (event) ->
 			console.log event.data
 

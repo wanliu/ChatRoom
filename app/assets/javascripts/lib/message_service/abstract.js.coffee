@@ -10,13 +10,27 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 
 # author: hysios@gmail.com
+# 
+namespace "MessageService",  (ex) ->
 
-class HomeController < ApplicationController
-  before_filter :authenticate_user!
-  respond_to :json
+	class ex.AbstractAdapter
 
-  def index
-  	session["hello"] = "world"
-  	# render :json => session["current"]
-  end
-end
+		constructor: (@options) ->
+
+		subscribe: (name, callback) ->
+
+		subscribies: (args..., callback) ->
+
+		sendObject: (url, hash, options) ->
+
+		unsubscribe: (name) ->
+
+		onmessage: (callback) ->
+
+		onopen: (callback) ->
+
+		onerror: (callback) ->
+
+		onclose: (callback) ->
+
+		close: () ->

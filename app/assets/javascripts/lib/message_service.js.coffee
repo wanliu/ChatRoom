@@ -10,6 +10,9 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 
 # author: hysios@gmail.com
+#
+#= require_tree "./message_service"
+
 
 # 消息注册服务
 # 使用方法
@@ -89,7 +92,7 @@ namespace "MessageService", (ex) ->
 
 		config = {
 			url             : "/stream",
-			adapter         : new @EventSourceAdapter("/stream"), 
+			adapter         : "EventSource", 
 			message_handler : new @MessageHandler
 		}
 		handle.call(@, config) if handle?
@@ -106,10 +109,10 @@ namespace "MessageService", (ex) ->
 
 		standalone_service.unregisterMessage(name)
 
-	ex.sendObject = (object_hash) ->
+	ex.sendObject = (url, object_hash) ->
 		return false unless standalone_service?
 
-		standalone_service.sendObject(object_hash)
+		standalone_service.sendObject(url, object_hash)
 
 	ex.close = () ->
 		standalone_service.close()
@@ -117,15 +120,22 @@ namespace "MessageService", (ex) ->
 
 	class ex.StandaloneService
 		constructor: (@options = {}) ->
-			@url ||= "/stream"
-			@adapter ||= new ex.EventSourceAdapter(
-				url    : @url, 
-				caller : @options.message_handler)
+			@url = @options.url || "/stream"
+			if _.isString(@options.adapter)
+				name = @options.adapter
+				klass = ex[name + "Adapter"]
+			else if _.isFunction(@options.adapter)
+				klass = @options.adapter
 
-			@adapter.onmessage(@options.onmessage) if @options.onmessage?
-			@adapter.onopen(@options.onopen) if @options.onopen?
-			@adapter.onerror(@options.onerror) if @options.onerror?
-			@adapter.onclose(@options.onclose) if @options.onclose?
+			if klass?
+				@adapter ||= new klass(
+					url    : @url, 
+					caller : @options.message_handler)
+
+				@adapter.onmessage(@options.onmessage) if @options.onmessage?
+				@adapter.onopen(@options.onopen) if @options.onopen?
+				@adapter.onerror(@options.onerror) if @options.onerror?
+				@adapter.onclose(@options.onclose) if @options.onclose?
 
 
 		registerMessage: (name, callback) ->
@@ -134,73 +144,11 @@ namespace "MessageService", (ex) ->
 		unregisterMessage: (name) ->
 			@adapter.unsubscribe(name)
 
-		sendObject: (hash, options) ->
-			@adapter.sendObject(hash, options)
+		sendObject: (url, hash, options) ->
+			@adapter.sendObject(url, hash, options)
 
 		close: () ->
 			@adapter.close()
-
-
-	class ex.AbstractAdapter
-
-		constructor: (@options) ->
-
-		subscribe: (name, callback) ->
-
-		subscribies: (args..., callback) ->
-
-		sendObject: (hash, options) ->
-
-		unsubscribe: (name) ->
-
-		onmessage: (callback) ->
-
-		onopen: (callback) ->
-
-		onerror: (callback) ->
-
-		onclose: (callback) ->
-
-		close: () ->
-
-
-
-	class ex.EventSourceAdapter extends ex.AbstractAdapter
-
-		constructor: (@options) ->
-			@caller = @options.caller || new ex.MessageHandler
-			@url    = @options.url || "/stream"
-			@bound_adapter = @options.bound_adapter || new EventSource(@url)
-			@registed_message_queues = {}
-
-		subscribie: (name, callback) ->
-			handler = @caller.handle(callback)
-			@bound_adapter.addEventListener(name, handler, false)
-
-		unsubscribe: (name) ->
-			@bound_adapter.removeEventListener(name)
-
-		subscribies: (args..., callback) ->
-			for event_name in args
-				@subscribie(event_name, callback)
-
-		sendObject: (hash, options) ->
-			$.post(@url, hash, options)
-
-		onopen: (callback) ->
-			@bound_adapter.onopen = callback
-
-		onerror: (callback) ->
-			@bound_adapter.onerror = callback
-
-		onmessage: (callback) ->
-			@bound_adapter.onmessage = callback
-
-		onclose: (callback) ->
-			@bound_adapter.onclose = callback
-
-		close: () ->
-			@bound_adapter.close()
 
 
 

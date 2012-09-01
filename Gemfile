@@ -52,6 +52,8 @@ gem 'rails-i18n'
 # Async Server
 gem "sinatra"
 gem "thin"
+gem "faye-rails"
+#gem "faye"
 
 # To use Jbuilder templates for JSON
 # gem 'jbuilder'

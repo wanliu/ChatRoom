@@ -19,10 +19,9 @@ namespace "ChatRoom", (ex) ->
 
 		initialize: (options) ->
 			_.extend(@, options)
+			@registerListener("rooms/#{@model.id}")
 			@members = new ex.RoomUsers(room : @model)
 			@members.fetch()
-
-			@registerListener("room_#{@model.id}")
 
 		render: () ->
 			$(@el).html(@template())
@@ -31,9 +30,8 @@ namespace "ChatRoom", (ex) ->
 			$(window).resize($.proxy(@resize,@))
 			setTimeout($.proxy(@resize, @) , 10)
 
-		chat: (event) ->
+		chat: (result) ->
 		
-			result = JSON.parse(event.data)
 			author = @getMemberUser(result.author)
 			author_img = image_tag(author.gravatar(s: 13))
 			@$chat.append("<p>#{author_img}<span class=\"author\">&nbsp;#{result.author}:</span><span>#{result.msg}</span><p>")
@@ -56,9 +54,16 @@ namespace "ChatRoom", (ex) ->
 			msg = @$msg.val()
 			msg_hash = {
 				'msg'     : msg
-				'room_id' : @model.get("id")
+				'author' : Home.current_user.get("name")
 			}
-			@sendObject(msg_hash)
+
+			publication = @sendObject(@eventPath("chat"), msg_hash)
+
+			publication.callback () ->
+				console.log 'Message received by server!'
+
+			publication.errback (error) ->
+				console.log 'There was a problem: ' + error.message
 
 			@$msg.val("")
 			false

@@ -72,6 +72,7 @@ module StreamServer
           
           ms = Message.new
           ms
+            .id(10000)
             .event("room_#{room.id}_#{event}")
             .data(:author => current_user.name, :msg => msg)
        end

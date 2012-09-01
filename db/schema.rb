@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120824091158) do
+ActiveRecord::Schema.define(:version => 20120831072143) do
 
   create_table "authorizations", :force => true do |t|
     t.string   "provider"
@@ -81,6 +81,7 @@ ActiveRecord::Schema.define(:version => 20120824091158) do
     t.string   "unlock_token"
     t.datetime "locked_at"
     t.string   "authentication_token"
+    t.integer  "sign_in_status"
   end
 
   add_index "users", ["authentication_token"], :name => "index_users_on_authentication_token", :unique => true
