@@ -14,6 +14,8 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 
+#= require "faye-browser"
+
 namespace "ChatRoom", (exports) ->
 
 	class DelayedApplicatonBase
@@ -432,6 +434,10 @@ namespace "ChatRoom", (exports) ->
 
 
 	MessageService.initialize (config) ->
+
+		config.url = "/faye"
+		config.adapter = "Faye" 
+
 		config.onmessage = (event) ->
 			console.log event.data
 
