@@ -82,13 +82,18 @@ namespace 'ChatRoom' ,(exports) ->
 
 		tagName: 'li'
 		className: 'room_button'
+		
 
 		events:  {
-			"click": "joinRoom"
+			"click"		: "joinRoom"
+			'mouseover'	: 'roomDetail'
+			'mouseleave': 'detaildown'
 		}
 
 		initialize: (options) ->
 			_.extend(@, options)
+			@members  = new exports.RoomUsers(room: @model)
+			
 
 		render: () ->
 			$(@el).html(@model.get("name"))
@@ -97,6 +102,22 @@ namespace 'ChatRoom' ,(exports) ->
 		joinRoom: () ->
 			@model.enter () =>
 				@switchView()
+
+		roomDetail: () ->	
+			@user = new ChatRoom.User( "id" : @model.get('onwer'))		
+			@user.fetch(async : false)
+			# @members.fetch()
+			# ast = @members.models[0].attributes
+			@$el
+				.attr( "rel","popover")
+				.attr("data-original-title","房主:#{@user.get('name')},创建于:#{@user.get('created_at')}")
+				.attr("data-content","通告板:这是我的地盘")
+			@$el.popover('show')		
+
+
+
+		detaildown: () ->
+			@$el.popover('hide')
 
 
 		switchView: () ->
