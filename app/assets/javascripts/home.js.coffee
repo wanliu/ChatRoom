@@ -78,6 +78,7 @@ namespace "ChatRoom", (exports) ->
 		events: {
 			#"click": "doFly"
 			"click .msg": "msgTo"
+			"hover .user_name" : "userInfo"
 		}
 
 		render: () ->
@@ -96,6 +97,9 @@ namespace "ChatRoom", (exports) ->
 
 		position_to_coord: (position) ->
 			@coord(position.left, position.top)
+
+		userInfo: () ->
+			@$(".user_name").popover('toggle')
 
 		msgTo: () ->
 			Backbone.history.navigate("msg_to/#{@model.get('email')}", {trigger: true, replace: true})

@@ -17,6 +17,6 @@ class HomeController < ApplicationController
 
   def index
   	session["hello"] = "world"
-  	# render :json => session["hello"]
+  	# render :json => session["current"]
   end
 end
