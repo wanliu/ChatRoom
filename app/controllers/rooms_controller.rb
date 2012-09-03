@@ -2,9 +2,8 @@ class RoomsController < ApplicationController
 	before_filter :authenticate_user!
 	respond_to :json, :html
 
-	def create
-		
-		@room = Room.new(:name => params[:name])
+	def create	
+		@room = Room.new(:name => params[:name],:onwer => current_user.id)
 		@room.members << current_user
 
 		if @room.save
@@ -60,17 +59,17 @@ class RoomsController < ApplicationController
 		@room = Room.find(params[:id])
 		@room.members << current_user unless @room.members.exists?(current_user.id)
 		respond_with(@room)
-  end
+  	end
 
-  def members
-    @room = Room.find(params[:id])
-    respond_with(@room.members)
-  end
+	def members
+	    @room = Room.find(params[:id])
+	    respond_with(@room.members)
+  	end
 
-  def member
-    @user = User.joins(:rooms).where("users.name = ? and rooms.id = ?", params[:name], params[:id]).first
-    respond_with(@user)
+  	def member
+	    @user = User.joins(:rooms).where("users.name = ? and rooms.id = ?", params[:name], params[:id]).first
+	    respond_with(@user)
 
-  end
+  	end
 
 end
