@@ -22,6 +22,7 @@ namespace "ChatRoom", (ex) ->
 				console.log "浏览器支持Notifications！"
 			else
 				console.log "浏览器不支持Notifications！"
+
 			_.extend(@, options)
 			@registerListener("rooms/#{@model.id}")
 			@members = new ex.RoomUsers(room : @model)
@@ -41,17 +42,18 @@ namespace "ChatRoom", (ex) ->
 			max = @$chat[0].scrollHeight - @$chat.height()
 			@$chat.scrollTop(max)
 
-			if window.webkitNotifications.checkPermission() == 0 
-				notification = window.webkitNotifications.createNotification(author.gravatar_url(), result.author, result.msg)
-				notification.ondisplay= ()->  
-					console.log("display")
-				notification.onclose= ()-> 
-					console.log("close")
+			if author.attributes.name != Home.current_user.get("name")
+				if window.webkitNotifications.checkPermission() == 0 
+					notification = window.webkitNotifications.createNotification(author.gravatar_url(), result.author, result.msg)
+					notification.ondisplay= ()->  
+						console.log("display")
+					notification.onclose= ()-> 
+						console.log("close")
 
-				notification.show()
-				setTimeout((-> notification.cancel()), 4000)
-			else
-				window.webkitNotifications.requestPermission()
+					notification.show()
+					setTimeout((-> notification.cancel()), 4000)
+				else
+					window.webkitNotifications.requestPermission()
 
 		getMemberUser: (name) ->
 			user = @members.find (user) -> 
