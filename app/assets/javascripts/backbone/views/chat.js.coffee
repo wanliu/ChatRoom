@@ -1,5 +1,25 @@
 namespace "ChatRoom", (ex) ->
 
+	class ex.Message
+		time : 1
+		defaultTitle : document.title
+		timer : null
+
+		show: ()->
+			@time++
+			if @time%2 == 0
+				document.title = "【新消息】"
+			else
+				document.title = "【　　　】"
+			document.title += @defaultTitle
+			if  !@timer
+				@timer = self.setInterval($.proxy(@show, @) , 600)
+
+		clear: ()->
+			window.clearInterval(@timer)
+			@timer = null
+			document.title = @defaultTitle
+
 	class ex.ChatView extends ChatRoom.MessageView
 
 		msg_target: "#msg"
@@ -28,6 +48,12 @@ namespace "ChatRoom", (ex) ->
 			@members = new ex.RoomUsers(room : @model)
 			@members.fetch()
 
+			@message = new ex.Message()
+			$("body").click($.proxy(@restoreTitle, @))
+
+		restoreTitle: () ->
+			@message.clear()
+
 		render: () ->
 			$(@el).html(@template())
 			@$chat = @$("#chat")
@@ -42,18 +68,19 @@ namespace "ChatRoom", (ex) ->
 			max = @$chat[0].scrollHeight - @$chat.height()
 			@$chat.scrollTop(max)
 
-			if author.attributes.name != Home.current_user.get("name")
+			if (!document.hasFocus()) && (author.attributes.name != Home.current_user.get("name"))
 				if window.webkitNotifications.checkPermission() == 0 
 					notification = window.webkitNotifications.createNotification(author.gravatar_url(), result.author, result.msg)
-					notification.ondisplay= ()->  
-						console.log("display")
-					notification.onclose= ()-> 
-						console.log("close")
+					notification.ondisplay = ()->  
+						# console.log("display")
+					notification.onclose = ()-> 
+						# console.log("close")
 
 					notification.show()
 					setTimeout((-> notification.cancel()), 4000)
 				else
 					window.webkitNotifications.requestPermission()
+				@message.show()
 
 		getMemberUser: (name) ->
 			user = @members.find (user) -> 
