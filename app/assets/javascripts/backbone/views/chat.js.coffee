@@ -95,7 +95,7 @@ namespace "ChatRoom", (ex) ->
 
 		sendChat: () ->
 
-			msg = @$msg.val()
+			msg = @$msg.html()
 			msg_hash = {
 				'msg'     : msg
 				'author' : Home.current_user.get("name")
@@ -109,7 +109,7 @@ namespace "ChatRoom", (ex) ->
 			publication.errback (error) ->
 				console.log 'There was a problem: ' + error.message
 
-			@$msg.val("")
+			@$msg.html("")
 			false
 
 		ctrlEnter: (event) ->

@@ -103,6 +103,25 @@ namespace 'ChatRoom' ,(exports) ->
 			@model.enter () =>
 				@switchView()
 
+		initMessEditor: (roomName) ->
+			showEmoticonsId = "showEmoticons#{roomName}"
+			$("#showEmoticons").attr("id", showEmoticonsId)
+			$("#"+showEmoticonsId).append('<div id="emoticons" style="display:none; position: absolute; left: 4%; top: 40%; z-index: 811213; "></div>')
+			for i in [0..99]
+				if i % 11 == 0
+					$("#"+showEmoticonsId).find("#emoticons").append('<br>')	
+				$("#"+showEmoticonsId).find("#emoticons").append("<img id=#{i} src='assets/emoticons/#{i}.gif'>")
+			
+			$("#"+showEmoticonsId).click(() ->
+				$("#"+showEmoticonsId).find("#emoticons").toggle()
+			)
+
+			$("#"+showEmoticonsId).find("#emoticons>img").click(() -> 
+					id = $(@).attr("id")
+					$(".tab-pane.active").find("#msg").append("<img src='assets/emoticons/#{id}.gif'>")
+					# $("#"+showEmoticonsId).find("#emoticons").hide()
+			)
+
 		roomDetail: () ->	
 			@user = new ChatRoom.User( "id" : @model.get('onwer'))		
 			@user.fetch(async : false)
@@ -114,17 +133,15 @@ namespace 'ChatRoom' ,(exports) ->
 				.attr("data-content","通告板:这是我的地盘")
 			@$el.popover('show')		
 
-
-
 		detaildown: () ->
 			@$el.popover('hide')
-
 
 		switchView: () ->
 			unless @chat_view?
 				@chat_view = new exports.ChatView(el: $("<div/>"), model: @model)
 				@chat_view.render()
 				@parent_view.addPane(@model.get("name"), @chat_view, @)
+				@initMessEditor(@model.get("name"))
 
 			@parent_view.active(@model.get("name"))
 
