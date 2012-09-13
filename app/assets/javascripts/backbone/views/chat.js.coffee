@@ -38,11 +38,7 @@ namespace "ChatRoom", (ex) ->
 		}
 
 		initialize: (options) ->
-			if window.webkitNotifications 
-				console.log "浏览器支持Notifications！"
-			else
-				console.log "浏览器不支持Notifications！"
-
+			@checkNotifictionsSupport()
 			_.extend(@, options)
 			@registerListener("rooms/#{@model.id}")
 			@members = new ex.RoomUsers(room : @model)
@@ -50,6 +46,12 @@ namespace "ChatRoom", (ex) ->
 
 			@message = new ex.Message()
 			$("body").click($.proxy(@restoreTitle, @))
+
+		checkNotifictionsSupport: () ->
+			if window.webkitNotifications 
+				console.log "浏览器支持Notifications！"
+			else
+				console.log "浏览器不支持Notifications！"
 
 		restoreTitle: () ->
 			@message.clear()
@@ -67,7 +69,9 @@ namespace "ChatRoom", (ex) ->
 			@$chat.append("<p>#{author_img}<span class=\"author\">&nbsp;#{result.author}:</span><span>#{result.msg}</span><p>")
 			max = @$chat[0].scrollHeight - @$chat.height()
 			@$chat.scrollTop(max)
+			@showMessageNotifiction()
 
+		showMessageNotifiction: () ->
 			if (!document.hasFocus()) && (author.attributes.name != Home.current_user.get("name"))
 				if window.webkitNotifications.checkPermission() == 0 
 					notification = window.webkitNotifications.createNotification(author.gravatar_url(), result.author, result.msg)

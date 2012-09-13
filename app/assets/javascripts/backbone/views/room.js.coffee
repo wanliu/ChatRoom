@@ -106,14 +106,16 @@ namespace 'ChatRoom' ,(exports) ->
 		initMessEditor: (roomName) ->
 			showEmoticonsId = "showEmoticons#{roomName}"
 			$("#showEmoticons").attr("id", showEmoticonsId)
-			$("#"+showEmoticonsId).append('<div id="emoticons" style="display:none; position: absolute; left: 4%; top: 40%; z-index: 811213; "></div>')
+			$("#"+showEmoticonsId).append('<div id="emoticons" style="display:none; position: absolute; left: 4%; top: 40%; z-index: 888; "></div>')
+
+			emoticons = $("#"+showEmoticonsId).find("#emoticons")
 			for i in [0..99]
 				if i % 11 == 0
-					$("#"+showEmoticonsId).find("#emoticons").append('<br>')	
-				$("#"+showEmoticonsId).find("#emoticons").append("<img id=#{i} src='assets/emoticons/#{i}.gif'>")
+					emoticons.append('<br>')	
+				emoticons.append("<img id=#{i} src='assets/emoticons/#{i}.gif'>")
 			
 			$("#"+showEmoticonsId).click(() ->
-				$("#"+showEmoticonsId).find("#emoticons").toggle()
+				emoticons.toggle()
 			)
 
 			$("#"+showEmoticonsId).find("#emoticons>img").click(() -> 
