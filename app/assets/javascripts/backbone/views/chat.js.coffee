@@ -31,18 +31,23 @@ namespace "ChatRoom", (ex) ->
 			"submit .input-text": "sendChat"
 			"keydown #msg"		: "ctrlEnter"
 			"click .quitRoom"	: "quitRoom"
+			"click #showEmoticons" : "showEmoticons"
+			"click #emoticons>img" : "hideEmoticons"
 		}
+
+		showEmoticons: () ->
+			$(".tab-pane.active").find("#emoticons").toggle()
+
+		hideEmoticons: (event) ->
+			$(".tab-pane.active").find("#msg").append("<img src='#{event.currentTarget.src}'>")
+			$(".tab-pane.active").find("#emoticons").hide()
 
 		messages: {
 			"chat": "chat"
 		}
 
 		initialize: (options) ->
-			if window.webkitNotifications 
-				console.log "浏览器支持Notifications！"
-			else
-				console.log "浏览器不支持Notifications！"
-
+			@checkNotifictionsSupport()
 			_.extend(@, options)
 			@registerListener("rooms/#{@model.id}")
 			@members = new ex.RoomUsers(room : @model)
@@ -50,6 +55,12 @@ namespace "ChatRoom", (ex) ->
 
 			@message = new ex.Message()
 			$("body").click($.proxy(@restoreTitle, @))
+
+		checkNotifictionsSupport: () ->
+			if window.webkitNotifications 
+				console.log "浏览器支持Notifications！"
+			else
+				console.log "浏览器不支持Notifications！"
 
 		restoreTitle: () ->
 			@message.clear()
@@ -67,7 +78,9 @@ namespace "ChatRoom", (ex) ->
 			@$chat.append("<p>#{author_img}<span class=\"author\">&nbsp;#{result.author}:</span><span>#{result.msg}</span><p>")
 			max = @$chat[0].scrollHeight - @$chat.height()
 			@$chat.scrollTop(max)
+			@showMessageNotifiction()
 
+		showMessageNotifiction: () ->
 			if (!document.hasFocus()) && (author.attributes.name != Home.current_user.get("name"))
 				if window.webkitNotifications.checkPermission() == 0 
 					notification = window.webkitNotifications.createNotification(author.gravatar_url(), result.author, result.msg)
@@ -95,7 +108,7 @@ namespace "ChatRoom", (ex) ->
 
 		sendChat: () ->
 
-			msg = @$msg.val()
+			msg = @$msg.html()
 			msg_hash = {
 				'msg'     : msg
 				'author' : Home.current_user.get("name")
@@ -109,7 +122,7 @@ namespace "ChatRoom", (ex) ->
 			publication.errback (error) ->
 				console.log 'There was a problem: ' + error.message
 
-			@$msg.val("")
+			@$msg.html("")
 			false
 
 		ctrlEnter: (event) ->

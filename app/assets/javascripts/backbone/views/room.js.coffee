@@ -114,11 +114,8 @@ namespace 'ChatRoom' ,(exports) ->
 				.attr("data-content","通告板:这是我的地盘")
 			@$el.popover('show')		
 
-
-
 		detaildown: () ->
 			@$el.popover('hide')
-
 
 		switchView: () ->
 			unless @chat_view?

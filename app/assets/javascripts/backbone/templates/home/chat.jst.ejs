@@ -1,8 +1,19 @@
 <pre id='chat'></pre>
 <form class='input-text'>
-  <div class="row"> 
+  <div class="row">
+    <div class="span2" id="showEmoticons">
+        <%= image_tag("assets/emoticons/0.gif") %>
+    </div> 
+    <div id="emoticons" style="display:none; position: absolute; left: 3%; top: 46%; z-index: 888; ">
+        <% for(var i = 0; i < 100; i++) {%>
+            <% if (i%10 == 0) {%>
+                 <br>
+            <% } %>
+            <%= image_tag("assets/emoticons/"+i+".gif") %>
+        <% } %>
+    </div> 
     <div class="span8"> 
-       <textarea id='msg' class="span9" placeholder='type message here...' />
+       <div id='msg' contentEditable="true" style="border:1px solid #ccc;" class="span8" placeholder='type message here...' />
     </div>
     <div class="span1 pull-right">
       <button class="btn btn-primary">发送</button>
