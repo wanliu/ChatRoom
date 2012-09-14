@@ -15,7 +15,7 @@ group :assets do
   gem 'coffee-rails', '~> 3.2.1'
 
   # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-  # gem 'therubyracer', :platforms => :ruby
+  gem 'therubyracer', :platforms => :ruby
   gem 'anjlab-bootstrap-rails', '>= 2.1', :require => 'bootstrap-rails'
   gem "rails-backbone"
   gem 'jquery-rails'
