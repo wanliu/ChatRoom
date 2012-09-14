@@ -120,6 +120,7 @@ GEM
     json (1.7.5)
     jwt (0.1.5)
       multi_json (>= 1.0)
+    libv8 (3.3.10.4)
     libwebsocket (0.1.5)
       addressable
     mail (2.4.4)
@@ -234,6 +235,8 @@ GEM
       rack (~> 1.0)
       tilt (~> 1.1, != 1.3.0)
     sqlite3 (1.3.6)
+    therubyracer (0.10.2)
+      libv8 (~> 3.3.10)
     thin (1.4.1)
       daemons (>= 1.0.9)
       eventmachine (>= 0.12.6)
@@ -282,6 +285,7 @@ DEPENDENCIES
   sass-rails (~> 3.2.3)
   sinatra
   sqlite3
+  therubyracer
   thin
   uglifier (>= 1.0.3)
   uuidtools
