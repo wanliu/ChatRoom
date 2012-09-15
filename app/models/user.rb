@@ -71,14 +71,4 @@ class User < ActiveRecord::Base
     where(conditions).where(["name = :value OR email = :value", { :value => login }]).first
   end
 
-  # created by Jzl
-  def self.create_with_omniauth(auth)
-    #binding.pry
-    create! do |user|
-      user.provider = auth["provider"]
-      user.uid = auth["uid"]
-      user.email = auth["info"]["email"] + " from "+ user.provider
-      user.password = Devise.friendly_token[0,20]
-    end
-  end
 end
