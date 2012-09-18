@@ -48,10 +48,8 @@ ChatRoom::Application.configure do
   # config.action_controller.asset_host = "http://assets.example.com"
 
   # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
-  config.assets.precompile += %w( search.js )
-  config.assets.precompile = [/(?:\/|\\|\A)application\.(css|js)$/] 
-  config.assets.precompile += %w( login.js login.css admin.js viewport.css client_view.js bootstrap_and_overrides.css) 
-  config.assets.precompile += [/themes\/\w+\.css$/]
+  config.assets.precompile << '*.js' 
+  config.assets.precompile << '*.css'  
 
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false
