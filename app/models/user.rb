@@ -38,23 +38,6 @@ class User < ActiveRecord::Base
   attr_accessor :default_room, :login
   @default_room = nil
 
-  def join(room_name)
-    room = Room.find_by_name(room_name)
-    if room
-      r = build_room_member
-      r.room = room
-      r.save
-    end
-  end
-
-  def leave
-    return false if room_member.blank?
-
-    room_member.delete
-    save
-    reload
-  end
-
   def gravatar
     "http://www.gravatar.com/avatar.php?gravatar_id=#{Digest::MD5::hexdigest(email)}"
   end
